@@ -1,5 +1,5 @@
 {
-  "name": "synthesis_workload_generator",
+  "name": "synthetic_workload_generator",
   "version": "1.0.0",
   "author": "Michel Gokan <gokan.michel@gmail.com>",
   "main": "app.js",

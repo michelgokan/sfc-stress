@@ -1,35 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: synthesis-workload-generator
+  name: synthetic-workload-generator
   namespace: ingress-nginx
   labels:
-    name: synthesis-workload-generator
-    app: synthesis-workload-generator
+    name: synthetic-workload-generator
+    app: synthetic-workload-generator
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: synthesis-workload-generator
+      name: synthetic-workload-generator
   template:
     metadata:
       labels:
-        name: synthesis-workload-generator
+        name: synthetic-workload-generator
         namespace: ingress-nginx
     spec:
       containers:
-        - name: synthesis-workload-generator
-          image: michelgokan/synthesis-workload-generator
+        - name: synthetic-workload-generator
+          image: michelgokan/synthetic-workload-generator
           ports:
             - containerPort: 30005
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: synthesis-workload-generator
+  name: synthetic-workload-generator
   namespace: ingress-nginx
   labels:
-    app: synthesis-workload-generator
+    app: synthetic-workload-generator
 spec:
   ports:
   - port: 30005
@@ -37,13 +37,13 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: synthesis-workload-generator
+    app: synthetic-workload-generator
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: synthesis-workload-generator-ingress
+  name: synthetic-workload-generator-ingress
   namespace: ingress-nginx
   annotations:
      nginx.ingress.kubernetes.io/ssl-redirect: "false"
@@ -56,5 +56,5 @@ spec:
         paths:
           - path: /workload
             backend:
-              serviceName: synthesis-workload-generator
+              serviceName: synthetic-workload-generator
               servicePort: 30005
