@@ -1,0 +1,15 @@
+{
+  "name": "synthesis_workload_generator",
+  "version": "1.0.0",
+  "author": "Michel Gokan <gokan.michel@gmail.com>",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "crypto": "latest",
+    "express": "latest",
+    "fs": "0.0.1-security",
+    "malloc": "latest"
+  }
+}
