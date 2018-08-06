@@ -4,17 +4,16 @@ metadata:
   name: synthetic-workload-generator
   namespace: ingress-nginx
   labels:
-    name: synthetic-workload-generator
     app: synthetic-workload-generator
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: synthetic-workload-generator
+      app: synthetic-workload-generator
   template:
     metadata:
       labels:
-        name: synthetic-workload-generator
+        app: synthetic-workload-generator
         namespace: ingress-nginx
     spec:
       containers:
@@ -34,6 +33,7 @@ spec:
   ports:
   - port: 30005
     targetPort: 30005
+    nodePort: 30005
     protocol: TCP
     name: http
   selector:
