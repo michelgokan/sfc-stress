@@ -9,4 +9,4 @@ app.get('/disk', (req, res) => res.send(workloads.diskIntensiveWorkload().toStri
 app.get('/net', (req, res) => res.send(workloads.networkIntensiveWorkload().toString()));
 app.get('/x', (req, res) => res.send(workloads.combinedWorkload().toString()));
 
-app.listen(30005, () => console.log('Example app listening on port 30005!'));
+app.listen(30005, "0.0.0.0");
