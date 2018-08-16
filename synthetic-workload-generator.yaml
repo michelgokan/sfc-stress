@@ -33,7 +33,6 @@ spec:
   ports:
   - port: 30005
     targetPort: 30005
-    nodePort: 30005
     protocol: TCP
     name: http
   selector:
