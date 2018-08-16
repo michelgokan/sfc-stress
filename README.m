@@ -1,0 +1,12 @@
+# Endpoints:
+* /cpu for CPU intensive workloads
+* /mem for memory intensive workloads
+* /disk for disk intensive workloads
+* /net for network intensive workloads
+* /x for combined workloads
+
+* CPU Intensive Workload: Generates 100 MD5 Checksums!
+* Memory Intensive Workload: Stores 1MB of data in the Memory and then release it after a while!
+* Disk Intensive Workload: Writes 1MB of data in the disk and then deletes it!
+* Network Intensive Workload: Send 1 MB of data to via network (HTTP)!
+* Combined Workload: Run all workloads mentioned above once!
