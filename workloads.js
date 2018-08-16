@@ -15,7 +15,11 @@ function getRandomInt(max) {
 
 module.exports = {
     CPUIntensiveWorkload: function () {
-        return checksum(getRandomInt(999999999999).toString());
+        for ($i = 0; $i < 100; $i++){
+           checksum(getRandomInt(999999999999).toString());
+        }
+
+        return "100 CHKSM OK!" 
     },
     memoryIntensiveWorkload: function () {
         $bigStr = "";
