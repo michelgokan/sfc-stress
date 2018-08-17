@@ -17,3 +17,6 @@ Writes 1MB of data in the disk and then deletes it!
 Send 1 MB of data to via network (HTTP)!
 ## Combined Workload: 
 Run all workloads mentioned above once!
+
+# Kubernetes Installation
+Simply use `kubectl apply -f synthetic-workload-generator.yaml` and access via `http://<your_nginx_address>/workload/`
