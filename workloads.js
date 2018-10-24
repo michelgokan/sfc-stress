@@ -15,7 +15,7 @@ function getRandomInt(max) {
 
 module.exports = {
     CPUIntensiveWorkload: function () {
-        for ($i = 0; $i < 100; $i++){
+        for ($i = 0; $i < 100000; $i++){
            checksum(getRandomInt(999999999999).toString());
         }
 
