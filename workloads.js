@@ -24,7 +24,7 @@ module.exports = {
            diffHell.generateKeys('base64');
         }
 
-        return workloadSize+" CHKSM OK!" 
+        return workloadSize+" CHKSM AND DIFFIEHELLMAN 60 OK!" 
     },
     memoryIntensiveWorkload: function () {
         $bigStr = "";
