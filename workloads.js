@@ -19,6 +19,9 @@ module.exports = {
         
         for ($i = 0; $i < workloadSize; $i++){
            checksum(getRandomInt(999999999999).toString());
+	   var prime_length = 60;
+	   var diffHell = crypto.createDiffieHellman(prime_length);
+           diffHell.generateKeys('base64');
         }
 
         return workloadSize+" CHKSM OK!" 
