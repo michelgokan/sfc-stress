@@ -7,7 +7,7 @@
 
 
 ## CPU Intensive Workload: 
-Generates 100 MD5 Checksums!
+Generates 10,000 MD5 Checksums plus a Diffie-Hellman key!
 
 ## Memory Intensive Workload: 
 Stores 1MB of data in the Memory and then release it after a while!
