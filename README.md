@@ -18,5 +18,5 @@ Send 1 MB of data to via network (HTTP)!
 ## Combined Workload: 
 Run all workloads mentioned above once!
 
-# Kubernetes Installation
+# Installation on Kubernetes
 Simply use `kubectl apply -f synthetic-workload-generator.yaml` and access via `http://<your_nginx_address>/workload/`
