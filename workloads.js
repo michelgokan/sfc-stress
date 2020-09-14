@@ -1,71 +1,120 @@
-var crypto = require('crypto');
-var fs = require('fs');
+// const req           = require("express");
+// const express       = require("express");
+const addresses = "http://127.0.0.1:30005/workload/mem,http://127.0.0.1:30005/workload/cpu";
+const addressesCount = addresses.split(',').length;
+// const addresses  = process.env.NEXT_SERVICES_ADDRESSES;
+const cpuWorkload = require('./cpu-workload');
+const netWorkload = require('./net-workload');
+// const promisedNetWorkload = require('./promised-net-workload');
+const memWorkload = require('./mem-workload');
+const blkioWorkload = require('./blkio-workload');
+const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 
+function getParameter(req, name, defaultValue = 1) {
+    let param;
+    if (req === undefined || req.params === undefined || req.params[name] === undefined)
+        param = defaultValue;
+    else
+        param = req.params[name];
 
-function checksum(str, algorithm, encoding) {
-    return crypto
-        .createHash(algorithm || 'md5')
-        .update(str, 'utf8')
-        .digest(encoding || 'hex')
+    return param;
 }
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
+function generatePromises(paramValue, threadsCount, filePath, func) {
+    let promises = [];
+    if (threadsCount === 1) {
+        promises.push(new Promise((resolve, reject) => {
+            func(paramValue);
+            resolve({paramValue: paramValue, threadsCount: threadsCount});
+        }));
+    } else {
+        for (let i = 0; i < threadsCount; i++) {
+            let worker = new Worker(filePath, {workerData: {paramValue: paramValue}});
+            promises.push(new Promise((resolve, reject) => {
+                worker.on('exit', () => {
+                    resolve({paramValue: paramValue, threadsCount: threadsCount});
+                });
+                worker.on('error', (err) => {
+                    reject(err)
+                });
+            }));
+        }
+    }
+
+    return promises;
+}
+
+function getReturnPromises(promises, req, sendToNext) {
+    let allPromises = Promise.all(promises);
+    if (sendToNext) {
+        return allPromises.then((response) => {
+            try {
+                module.exports.networkIntensiveWorkload(req, false, true);
+            } catch (e) {
+                return Promise.reject(e);
+            }
+            return response;
+        });
+    } else {
+        return allPromises;
+    }
 }
 
 module.exports = {
-    CPUIntensiveWorkload: function () {
-        var workloadSize = 1000;
-        
-        for ($i = 0; $i < workloadSize; $i++){
-           checksum(getRandomInt(999999999999).toString());
+    networkIntensiveWorkload: function (req = undefined, isPromised = false, isEmptyRequest = false) {
+        let payloadSize = isEmptyRequest ? 0 : getParameter(req, 'payloadSize');
+
+        if (addresses === "") return 0;
+
+        if (!isPromised) {
+            console.log("/net called!");
+            let result = netWorkload.executeNetWorkload(payloadSize, req, isPromised);
+            return "Transmitted " + payloadSize + "MB x " + addressesCount + " = " + payloadSize * addressesCount + "MB of data from " + req.protocol + "://" + req.get('host') + req.originalUrl + " to [" + addresses + "]  using 1 thread!"
+        } else {
+            let result = netWorkload.executePromisedNetWorkload(payloadSize);
+            return result;
         }
-   	var prime_length = 60;
-	var diffHell = crypto.createDiffieHellman(prime_length);
-        diffHell.generateKeys('base64');
-
-        return workloadSize+" CHKSM AND DIFFIEHELLMAN 60 OK!" 
     },
-    memoryIntensiveWorkload: function () {
-        $bigStr = "";
+    CPUIntensiveWorkload: function (req = undefined) {
+        console.log("/cpu called!");
+        let workloadSize = getParameter(req, 'workloadSize'),
+            threadsCount = getParameter(req, 'threadsCount'),
+            sendToNext = getParameter(req, 'sendToNext', false);
 
-        for ($i = 0; $i < 1024 * 1024; $i++) {
-            $bigStr = $bigStr + "a";
-        }
+        if (workloadSize === 0 || threadsCount === 0) return 0;
 
-        return "1";
+        let promises = generatePromises(workloadSize, threadsCount, "./cpu-workload.js", cpuWorkload.executeCPUWorkload);
+        return getReturnPromises(promises, req, sendToNext);
     },
-    diskIntensiveWorkload: function () {
-        var file_suffix = getRandomInt(99999999);
-        var file_name = "/tmp/test" + file_suffix;
-        var stream = fs.createWriteStream(file_name);
+    memoryIntensiveWorkload: function (req = undefined) {
+        console.log("/mem called!");
+        let dataSize = getParameter(req, 'dataSize'),
+            threadsCount = getParameter(req, 'threadsCount'),
+            sendToNext = getParameter(req, 'sendToNext', false);
 
-        stream.once('open', function (fd) {
-            for ($i = 0; $i < 1024 * 1024; $i++) {
-                stream.write("0");
-            }
-            stream.end(function () {
-                fs.unlinkSync(file_name);
-            });
-        });
+        if (dataSize === 0 || threadsCount === 0) return 0;
 
-        return "1";
+        let promises = generatePromises(dataSize, threadsCount, "./mem-workload.js", memWorkload.executeMemWorkload)
+        return getReturnPromises(promises, req, sendToNext);
     },
-    networkIntensiveWorkload: function() {
-        $bigStr = "";
+    blkioIntensiveWorkload: function (req = undefined) {
+        console.log("/blkio called!");
+        let fileSize = getParameter(req, 'fileSize'),
+            threadsCount = getParameter(req, 'threadsCount'),
+            sendToNext = getParameter(req, 'sendToNext', false);
 
-        for ($i = 0; $i < 1024 * 1024; $i++) {
-            $bigStr = $bigStr + "a";
-        }
+        if (fileSize === 0 || threadsCount === 0) return 0;
 
-        return $bigStr;
+        let promises = generatePromises(fileSize, threadsCount, "./blkio-workload.js", blkioWorkload.executeBlkioWorkload)
+        return getReturnPromises(promises, req, sendToNext);
     },
-    combinedWorkload: function(){
-        $a = this.CPUIntensiveWorkload();
-        $b = this.memoryIntensiveWorkload();
-        $c = this.diskIntensiveWorkload();
-        $d = this.networkIntensiveWorkload();
+    combinedWorkload: function (req) {
+        $a = this.CPUIntensiveWorkload(req);
+        $b = this.memoryIntensiveWorkload(req);
+        $c = this.blkioIntensiveWorkload(req);
+        $d = this.networkIntensiveWorkload(req);
 
-        return $d;
+        return "OK";
     }
-};
+}
+;

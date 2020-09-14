@@ -19,6 +19,9 @@ spec:
       containers:
         - name: synthetic-workload-generator
           image: michelgokan/synthetic-workload-generator
+          env:
+            - name: NEXT_SERVICES_ADDRESSES #comma separated
+              value: ""
           ports:
             - containerPort: 30005
 ---
