@@ -1,11 +1,10 @@
 // const req           = require("express");
 // const express       = require("express");
-const addresses = "http://127.0.0.1:30005/workload/mem,http://127.0.0.1:30005/workload/cpu";
+// const addresses = "http://127.0.0.1:30005/workload/mem,http://127.0.0.1:30005/workload/cpu";
+const addresses  = process.env.NEXT_SERVICES_ADDRESSES;
 const addressesCount = addresses.split(',').length;
-// const addresses  = process.env.NEXT_SERVICES_ADDRESSES;
 const cpuWorkload = require('./cpu-workload');
 const netWorkload = require('./net-workload');
-// const promisedNetWorkload = require('./promised-net-workload');
 const memWorkload = require('./mem-workload');
 const blkioWorkload = require('./blkio-workload');
 const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');

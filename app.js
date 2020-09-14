@@ -1,8 +1,8 @@
 const express = require('express');
 const app = express();
 let workloads = require("./workloads");
-const addresses = "http://127.0.0.1:30005/workload/mem,http://127.0.0.1:30005/workload/cpu";
-// const addresses  = process.env.NEXT_SERVICES_ADDRESSES;
+// const addresses = "http://127.0.0.1:30005/workload/mem,http://127.0.0.1:30005/workload/cpu";
+const addresses  = process.env.NEXT_SERVICES_ADDRESSES;
 const addressesCount = addresses.split(',').length;
     
 app.get('/workload/cpu/:workloadSize?/:threadsCount?/:sendToNext?', (req, res) =>
