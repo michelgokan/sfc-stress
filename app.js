@@ -27,11 +27,11 @@ app.use((req, res, next) => {
     next();
 })
 
-app.get('/workload/cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
+app.get('*/cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.CPUIntensiveWorkload(req).then(function (responses) {
         res.send("Executed " + responses[0].paramValue + " Diffie-Hellman checksums in " + responses[0].threadsCount + " thread(s)!");
     }).catch(err => res.send(err.toString())));
-app.post('/workload/cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
+app.post('*/cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.CPUIntensiveWorkload(req).then(function (responses) {
         try {
             res.send("Executed " + responses[0].paramValue + " Diffie-Hellman checksums in " + responses[0].threadsCount + " thread(s)!");
@@ -42,11 +42,11 @@ app.post('/workload/cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize?
         console.log("/cpu (post-connection closed)");
         res.send(err.toString());
     }));
-app.get('/workload/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
+app.get('*/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.memoryIntensiveWorkload(req).then(function (responses) {
         res.send("Stored and released " + responses[0].paramValue + " x " + responses[0].threadsCount + "=" + responses[0].paramValue * responses[0].threadsCount + "MB of data in RAM using " + responses[0].threadsCount + " thread(s)!");
     }).catch(err => res.send(err.toString())));
-app.post('/workload/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
+app.post('*/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.memoryIntensiveWorkload(req).then(function (responses) {
         try {
             res.send("Stored and released " + responses[0].paramValue + " x " + responses[0].threadsCount + "=" + responses[0].paramValue * responses[0].threadsCount + "MB of data in RAM using " + responses[0].threadsCount + " thread(s)!");
@@ -57,11 +57,11 @@ app.post('/workload/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?', (
         console.log("/mem (post-connection closed)");
         res.send(err.toString());
     }));
-app.get('/workload/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
+app.get('*/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.blkioIntensiveWorkload(req).then(function (responses) {
         res.send("Wrote and removed " + responses[0].paramValue + "MB x " + responses[0].threadsCount + " files = " + responses[0].paramValue * responses[0].threadsCount + "MB of data in the storage using " + responses[0].threadsCount + " thread(s)!");
     }).catch(err => res.send(err.toString())));
-app.post('/workload/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
+app.post('*/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.blkioIntensiveWorkload(req).then(function (responses) {
         try {
             res.send("Wrote and removed " + responses[0].paramValue + "MB x " + responses[0].threadsCount + " files = " + responses[0].paramValue * responses[0].threadsCount + "MB of data in the storage using " + responses[0].threadsCount + " thread(s)!");
@@ -73,29 +73,29 @@ app.post('/workload/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?',
         res.send(err.toString());
     }));
 
-// app.get('/workload/net/:payloadSize?/:threadsCount?', (req, res) =>
+// app.get('*/net/:payloadSize?/:threadsCount?', (req, res) =>
 //     workloads.networkIntensiveWorkload(req).then(function (responses) {
 //             res.send("Transmitted " + responses[0].paramValue + "MB x " + addressesCount + " destinations x " + responses[0].threadsCount + " threads = " + responses[0].paramValue * responses[0].threadsCount * addressesCount + "MB of data from " + req.protocol + "://" + req.get('host') + req.originalUrl + " to [" + addresses + "]  using " + responses[0].threadsCount + " thread(s)!");
 //     }).catch(err => res.send(err)));
 
-app.get('/workload/net/:payloadSize?', (req, res) => res.send(workloads.networkIntensiveWorkload(req, false).toString()));
-app.post('/workload/net/:payloadSize?', (req, res) => res.send(workloads.networkIntensiveWorkload(req, false).toString()));
+app.get('*/net/:payloadSize?', (req, res) => res.send(workloads.networkIntensiveWorkload(req, false).toString()));
+app.post('*/net/:payloadSize?', (req, res) => res.send(workloads.networkIntensiveWorkload(req, false).toString()));
 
 
-app.get('/workload/promisedNet/:payloadSize?', (req, res) =>
+app.get('*/promisedNet/:payloadSize?', (req, res) =>
     workloads.networkIntensiveWorkload(req, true).then(function (responses) {
         res.send([responses.concat('<br />')]);
     }).catch(err => {
         res.send(err.toString());
     }));
-app.post('/workload/promisedNet/:payloadSize?', (req, res) =>
+app.post('*/promisedNet/:payloadSize?', (req, res) =>
     workloads.networkIntensiveWorkload(req, true).then(function (responses) {
         res.send([responses.concat('<br />')]);
     }).catch(err => {
         res.send(err.toString());
     }));
 
-app.get('/workload/x', (req, res) => res.send(workloads.combinedWorkload().toString()));
-app.get('/workload/', (req, res) => res.send("Hi :)!<br />Please use one of the following endpoints:<br />* /cpu for CPU intensive workloads<br />* /mem for memory intensive workloads<br />* /disk for disk intensive workloads<br />* /net for network intensive workloads<br />* /x for combined workloads"));
+app.get('*/x', (req, res) => res.send(workloads.combinedWorkload().toString()));
+app.get('*/', (req, res) => res.send("Hi :)!<br />Please use one of the following endpoints:<br />* /cpu for CPU intensive workloads<br />* /mem for memory intensive workloads<br />* /disk for disk intensive workloads<br />* /net for network intensive workloads<br />* /x for combined workloads"));
 
 app.listen(30005, "0.0.0.0");
