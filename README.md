@@ -1,8 +1,7 @@
+# Introduction to Synthetic Service Mesh
 Synthetic Service Mesh is a customizable, multi-threaded, and Docker/Kubernetes based synthetic workload that is used to generate different types of service meshes with various types of workloads. It can be used to emulate any type of service chains in a cluster and can be easily deployed in Kubernetes or Docker Swarm environments. For example, you can generate the service chain below:    
 
 ![Image of a service chain](./images/service_chain.png)
-
-# Introduction
 
 # Endpoints:
 * /workload/cpu/:workloadSize?/:threadsCount?/:sendToNext? for CPU intensive workloads
