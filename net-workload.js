@@ -10,7 +10,7 @@ function getRequestOptions(address, payloadSize) {
     let options = urlToOptions(url_object);
     options.method = "POST";
     options.headers = {
-        'Keep-Alive': "max=" + payloadSize
+        'Keep-Alive': "max=" + (Number(payloadSize)+1).toString()
     };
     return options;
 }
@@ -25,7 +25,14 @@ function sendRequest(address, payloadSize) {
             data: onemb
         }));
     }
-
+    req.on('error', (error) => {
+        if(error.code !== "EPIPE"){
+            console.error(error);
+            throw error;
+        } else{
+            // console.error("EPIPE Error! Looks harmless :-)");
+        }
+    });
     req.end();
 
     return req;
@@ -40,12 +47,15 @@ function promisedSendRequest(address, payloadSize) {
                 // console.log(`statusCode: ${res.statusCode}`);
                 let body = [];
                 res.on('data', (chunk) => {
-                    console.log(chunk);
+                    // console.log(chunk.toString());
                     body.push(chunk);
                 });
                 res.on('end', function () {
                     let result = Buffer.concat(body).toString();
                     resolve(result);
+                });
+                res.on('error',(e) => {
+                   reject(e);
                 });
             });
             req.on('error', (error) => {

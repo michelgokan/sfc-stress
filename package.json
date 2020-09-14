@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "bigdecimal": "^0.6.1",
+    "body-parser": "^1.19.0",
     "crypto": "latest",
     "express": "latest",
     "fs": "0.0.1-security",
