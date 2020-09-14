@@ -22,10 +22,8 @@ Writes <fileSize>MB of data in the disk and then deletes it! It then calls the N
 Send <payloadSize>MB of data over network (POST HTTP) to N number of destinations specified in a comma separated environment variable NEXT_SERVICES_ADDRESSES!
 It comes in 2 types:
  
-### Normal:
-Sends and exit!
-### Promised:
-Send, wait for response and then exit!
+1. **Normal mode:** Send request and exit!
+2. **Promised mode:** Send request, wait for the response, and then exit!
 
 ## Combined Workload: 
 Run all workloads mentioned above once (with normal net)!
