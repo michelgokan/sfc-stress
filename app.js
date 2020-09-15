@@ -21,7 +21,7 @@ app.use((req, res, next) => {
     const start = process.hrtime();
 
     res.on('close', () => {
-        const durationInMilliseconds = getDurationInMilliseconds (start);
+        const durationInMilliseconds = getDurationInMilliseconds(start);
         console.log(`${req.method} ${req.originalUrl} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
     });
     next();
@@ -95,7 +95,43 @@ app.post('*/promisedNet/:payloadSize?', (req, res) =>
         res.send(err.toString());
     }));
 
-app.get('*/x', (req, res) => res.send(workloads.combinedWorkload().toString()));
+app.get('*/x/:isPromised?', (req, res) => {
+    let combinedWorkloadResults = workloads.combinedWorkload(req);
+    if (combinedWorkloadResults[0]) {
+        combinedWorkloadResults[1].then(function (responses) {
+            let result = workloads.runAll(req);
+            Promise.all(result).then((responses) => {
+                res.send([responses.concat('<br />')]);
+            }).catch(err => {
+                res.send(err.toString());
+            });
+        }).catch(err => {
+            res.send(err.toString());
+        });
+    } else {
+        res.send("OK");
+        let result = workloads.runAll(req);
+    }
+});
+app.post('*/x/:isPromised?', (req, res) => {
+    let combinedWorkloadResults = workloads.combinedWorkload(req);
+    if (combinedWorkloadResults[0]) {
+        combinedWorkloadResults[1].then(function (responses) {
+            let result = workloads.runAll(req);
+            Promise.all(result).then((responses) => {
+                res.send([responses.concat('<br />')]);
+            }).catch(err => {
+                res.send(err.toString());
+            });
+        }).catch(err => {
+            res.send(err.toString());
+        });
+    } else {
+        res.send("OK");
+        let result = workloads.runAll(req);
+    }
+});
+// app.get('*/x', (req, res) => res.send(workloads.combinedWorkload().toString()));
 app.get('*/', (req, res) => res.send("Hi :)!<br />Please use one of the following endpoints:<br />* /cpu for CPU intensive workloads<br />* /mem for memory intensive workloads<br />* /disk for disk intensive workloads<br />* /net for network intensive workloads<br />* /x for combined workloads"));
 
 app.listen(30005, "0.0.0.0");

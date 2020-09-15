@@ -119,12 +119,15 @@ module.exports = {
         return getReturnPromises(promises, req, sendToNext, payloadSize);
     },
     combinedWorkload: function (req) {
-        $a = this.CPUIntensiveWorkload(req);
-        $b = this.memoryIntensiveWorkload(req);
-        $c = this.blkioIntensiveWorkload(req);
-        $d = this.networkIntensiveWorkload(req);
+        let promisedNet = getParameter(req, 'isPromised', false);
+        let result = [promisedNet, this.networkIntensiveWorkload(req, promisedNet)];
+        return result;
+    },
+    runAll: function (req) {
+        let a = this.CPUIntensiveWorkload(req);
+        let b = this.memoryIntensiveWorkload(req);
+        let c = this.blkioIntensiveWorkload(req);
 
-        return "OK";
+        return [a, b, c];
     }
-}
-;
+};
