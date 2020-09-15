@@ -7,8 +7,8 @@ Synthetic Service Mesh is a customizable, multi-threaded, and Docker/Kubernetes 
 * /workload/cpu/:workloadSize?/:threadsCount?/:sendToNext? for CPU intensive workloads
 * /workload/mem/:dataSize?/:threadsCount?/:sendToNext? for memory intensive workloads
 * /workload/blkio/:fileSize?/:threadsCount?/:sendToNext? for disk intensive workloads
-* /workload/net/:payloadSize? for network intensive workloads
-* /workload/promisedNet/:payloadSize? for network intensive workloads
+* /workload/net/:payloadSize?/:sendToNext? for network intensive workloads
+* /workload/promisedNet/:payloadSize?/:sendToNext? for network intensive workloads
 * /x/:isPromised?/:sendToNext? for combined workloads
 
 
@@ -24,6 +24,8 @@ It comes in 2 types:
  
 1. **Normal mode:** Send request and exit!
 2. **Promised mode:** Send request, wait for the response, and then exit!
+
+In both cases above, it passes the sendToNext parameter to the next request.
 
 ## Combined Workload: 
 Run all workloads mentioned above once!
