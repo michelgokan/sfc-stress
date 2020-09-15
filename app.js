@@ -95,7 +95,7 @@ app.post('*/promisedNet/:payloadSize?', (req, res) =>
         res.send(err.toString());
     }));
 
-app.get('*/x/:isPromised?', (req, res) => {
+app.get('*/x/:isPromised?/:sendToNext?', (req, res) => {
     let combinedWorkloadResults = workloads.combinedWorkload(req);
     if (combinedWorkloadResults[0]) {
         combinedWorkloadResults[1].then(function (responses) {
@@ -113,7 +113,7 @@ app.get('*/x/:isPromised?', (req, res) => {
         let result = workloads.runAll(req);
     }
 });
-app.post('*/x/:isPromised?', (req, res) => {
+app.post('*/x/:isPromised?/:sendToNext?', (req, res) => {
     let combinedWorkloadResults = workloads.combinedWorkload(req);
     if (combinedWorkloadResults[0]) {
         combinedWorkloadResults[1].then(function (responses) {

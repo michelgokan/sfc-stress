@@ -9,7 +9,7 @@ Synthetic Service Mesh is a customizable, multi-threaded, and Docker/Kubernetes 
 * /workload/blkio/:fileSize?/:threadsCount?/:sendToNext? for disk intensive workloads
 * /workload/net/:payloadSize? for network intensive workloads
 * /workload/promisedNet/:payloadSize? for network intensive workloads
-* /x for combined workloads
+* /x/:isPromised?/:sendToNext? for combined workloads
 
 
 ## CPU Intensive Workload: 
@@ -26,7 +26,7 @@ It comes in 2 types:
 2. **Promised mode:** Send request, wait for the response, and then exit!
 
 ## Combined Workload: 
-Run all workloads mentioned above once (with normal net)!
+Run all workloads mentioned above once!
 
 # Installation on Kubernetes
-Simply use `kubectl apply -f synthetic-workload-generator.yaml` and access via `http://<your_nginx_address>/workload/`. Make sure to set NEXT_SERVICES_ADDRESSES environment variable in the yaml file for the network intensive workload and/or for properly forming your service mesh graph.
+Simply use `kubectl apply -f synthetic-service-mesh.yaml` and access via `http://<your_nginx_address>/workload/`. Make sure to set NEXT_SERVICES_ADDRESSES environment variable in the yaml file for the network intensive workload and/or for properly forming your service mesh graph.
