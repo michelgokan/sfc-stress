@@ -5,29 +5,31 @@ const name = process.env.NAME === undefined ? "undefined" : process.env.NAME;
 const http = require("http");
 const urlToOptions = require("url-to-options");
 const url = require("url");
+const FormData = require('form-data');
+const fs = require('fs');
 
 function getRequestOptions(address, payloadSize) {
     let url_object = new url.URL(address);
     let options = urlToOptions(url_object);
     options.method = "POST";
-    options.headers = {
-        'Keep-Alive': "max=" + (Number(payloadSize) + 1).toString(),
-        'Referer': name
-    };
     return options;
+}
+
+function getForm(payloadSize){
+    const form = new FormData();
+    if(payloadSize){
+        const readStream = fs.createReadStream('./payload/100MB.zip', {start:0, end: payloadSize*1000});
+        form.append('data', readStream);
+    }
+    return form;
 }
 
 function sendRequest(address, payloadSize) {
     let options = getRequestOptions(address, payloadSize);
+    const form = getForm(payloadSize);
+    options.headers = form.getHeaders();
     const req = http.request(options);
-    const onemb = require('./onemb');
 
-    for (let i = 0; i < payloadSize; i++) {
-        req.write(JSON.stringify({
-            data: onemb
-        }));
-    }
-    req.end();
     req.on('error', (error) => {
         if (error.code !== "EPIPE") {
             console.error(error);
@@ -36,8 +38,10 @@ function sendRequest(address, payloadSize) {
             // console.error("EPIPE Error! Looks harmless :-)");
         }
     });
-    req.on('finish', () => console.log("SENT - " + name + " sent a " + req.method + " request to " + address));
-
+    req.on('finish', () => {
+        console.log("SENT - " + name + " sent a " + req.method + " request to " + address);
+    });
+    form.pipe(req);
     return req;
 }
 
@@ -45,12 +49,11 @@ function promisedSendRequest(address, payloadSize) {
     return new Promise(function (resolve, reject) {
         try {
             let options = getRequestOptions(address, payloadSize);
-
+            const form = getForm(payloadSize);
+            options.headers = form.getHeaders();
             const req = http.request(options, (res) => {
-                // console.log(`statusCode: ${res.statusCode}`);
                 let body = [];
                 res.on('data', (chunk) => {
-                    // console.log(chunk.toString());
                     body.push(chunk);
                 });
                 res.on('end', function () {
@@ -62,21 +65,12 @@ function promisedSendRequest(address, payloadSize) {
                 });
             });
 
-            if (payloadSize !== 0) {
-                const data = require('./onemb');
-
-                for (let i = 0; i < payloadSize; i++) {
-                    req.write(JSON.stringify({
-                        data: data
-                    }));
-                }
-                req.shouldKeepAlive = true;
-            }
-            req.end();
+            form.pipe(req);
             req.on('error', (error) => {
                 reject(error);
             });
             req.on('finish', () => console.log("SENT - " + name + " sent a " + req.method + " request to " + address));
+            req.end();
         } catch (e) {
             reject(e);
         }
@@ -99,8 +93,6 @@ function executeNetWorkload(payloadSize, req, isPromised = false) {
         }
     }
 
-    // return "Transmitted " + payloadSize + "MB x " + splittedAddresses.length + " destinations = " + payloadSize * splittedAddresses.length + "MB of data from " + req.protocol + "://" + req.get('host') + req.originalUrl + " to [" + addresses + "]  using 1 thread!"
-    // return 1;
     return requests;
 }
 
