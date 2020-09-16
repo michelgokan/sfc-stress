@@ -78,17 +78,17 @@ app.post('*/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, r
 //             res.send("Transmitted " + responses[0].paramValue + "MB x " + addressesCount + " destinations x " + responses[0].threadsCount + " threads = " + responses[0].paramValue * responses[0].threadsCount * addressesCount + "MB of data from " + req.protocol + "://" + req.get('host') + req.originalUrl + " to [" + addresses + "]  using " + responses[0].threadsCount + " thread(s)!");
 //     }).catch(err => res.send(err)));
 
-app.get('*/net/:payloadSize?/:sendToNext?', (req, res) => res.send(workloads.networkIntensiveWorkload(req, false).toString()));
-app.post('*/net/:payloadSize?/:sendToNext?', (req, res) => res.send(workloads.networkIntensiveWorkload(req, false).toString()));
+app.get('*/net/:payloadSize?', (req, res) => res.send(workloads.networkIntensiveWorkload(req, false).toString()));
+app.post('*/net/:payloadSize?', (req, res) => res.send(workloads.networkIntensiveWorkload(req, false).toString()));
 
 
-app.get('*/promisedNet/:payloadSize?/:sendToNext?', (req, res) =>
+app.get('*/promisedNet/:payloadSize?', (req, res) =>
     workloads.networkIntensiveWorkload(req, true).then(function (responses) {
         res.send([responses.concat('<br />')]);
     }).catch(err => {
         res.send(err.toString());
     }));
-app.post('*/promisedNet/:payloadSize?/:sendToNext?', (req, res) =>
+app.post('*/promisedNet/:payloadSize?', (req, res) =>
     workloads.networkIntensiveWorkload(req, true).then(function (responses) {
         res.send([responses.concat('<br />')]);
     }).catch(err => {
