@@ -27,6 +27,7 @@ function sendRequest(address, payloadSize) {
             data: onemb
         }));
     }
+    req.end();
     req.on('error', (error) => {
         if (error.code !== "EPIPE") {
             console.error(error);
@@ -36,7 +37,6 @@ function sendRequest(address, payloadSize) {
         }
     });
     req.on('finish', () => console.log("SENT - " + name + " sent a " + req.method + " request to " + address));
-    req.end();
 
     return req;
 }
@@ -61,9 +61,6 @@ function promisedSendRequest(address, payloadSize) {
                     reject(e);
                 });
             });
-            req.on('error', (error) => {
-                reject(error);
-            });
 
             if (payloadSize !== 0) {
                 const data = require('./onemb');
@@ -75,8 +72,11 @@ function promisedSendRequest(address, payloadSize) {
                 }
                 req.shouldKeepAlive = true;
             }
-            req.on('finish', () => console.log("SENT - " + name + " sent a " + req.method + " request to " + address));
             req.end();
+            req.on('error', (error) => {
+                reject(error);
+            });
+            req.on('finish', () => console.log("SENT - " + name + " sent a " + req.method + " request to " + address));
         } catch (e) {
             reject(e);
         }
