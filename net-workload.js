@@ -35,7 +35,7 @@ function sendRequest(address, payloadSize) {
             // console.error("EPIPE Error! Looks harmless :-)");
         }
     });
-    req.on('finish', () => console.log("SENT - " + name + " sent a request to " + address))
+    req.on('finish', () => console.log("SENT - " + name + " sent a " + req.method + " request to " + address));
     req.end();
 
     return req;
@@ -75,7 +75,7 @@ function promisedSendRequest(address, payloadSize) {
                 }
                 req.shouldKeepAlive = true;
             }
-            req.on('finish', () => console.log("SENT - " + name + " sent a request to " + address))
+            req.on('finish', () => console.log("SENT - " + name + " sent a " + req.method + " request to " + address));
             req.end();
         } catch (e) {
             reject(e);
