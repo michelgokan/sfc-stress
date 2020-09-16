@@ -1,7 +1,7 @@
 const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 // const addresses = "http://127.0.0.1:30005/workload/mem,http://127.0.0.1:30005/workload/cpu";
 const addresses = process.env.NEXT_SERVICES_ADDRESSES;
-const name = process.env.NAME;
+const name = process.env.NAME === undefined ? "undefined" : process.env.NAME;
 const http = require("http");
 const urlToOptions = require("url-to-options");
 const url = require("url");
@@ -35,7 +35,7 @@ function sendRequest(address, payloadSize) {
             // console.error("EPIPE Error! Looks harmless :-)");
         }
     });
-    req.on('finish', () => console.log("Sent a request to " + address))
+    req.on('finish', () => console.log("SENT - " + name + " sent a request to " + address))
     req.end();
 
     return req;
@@ -75,7 +75,7 @@ function promisedSendRequest(address, payloadSize) {
                 }
                 req.shouldKeepAlive = true;
             }
-            req.on('finish', () => console.log("Sent a request to " + address))
+            req.on('finish', () => console.log("SENT - " + name + " sent a request to " + address))
             req.end();
         } catch (e) {
             reject(e);

@@ -30,7 +30,9 @@ app.use((req, res, next) => {
 app.get('*/cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.CPUIntensiveWorkload(req).then(function (responses) {
         res.send("Executed " + responses[0].paramValue + " Diffie-Hellman checksums in " + responses[0].threadsCount + " thread(s)!");
-    }).catch(err => res.send(err.toString())));
+    }).catch(err => {
+        res.send(err.toString());
+    }));
 app.post('*/cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.CPUIntensiveWorkload(req).then(function (responses) {
         try {
@@ -45,7 +47,9 @@ app.post('*/cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req,
 app.get('*/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.memoryIntensiveWorkload(req).then(function (responses) {
         res.send("Stored and released " + responses[0].paramValue + " x " + responses[0].threadsCount + "=" + responses[0].paramValue * responses[0].threadsCount + "MB of data in RAM using " + responses[0].threadsCount + " thread(s)!");
-    }).catch(err => res.send(err.toString())));
+    }).catch(err => {
+        res.send(err.toString());
+    }));
 app.post('*/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.memoryIntensiveWorkload(req).then(function (responses) {
         try {
@@ -60,7 +64,9 @@ app.post('*/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res
 app.get('*/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.blkioIntensiveWorkload(req).then(function (responses) {
         res.send("Wrote and removed " + responses[0].paramValue + "MB x " + responses[0].threadsCount + " files = " + responses[0].paramValue * responses[0].threadsCount + "MB of data in the storage using " + responses[0].threadsCount + " thread(s)!");
-    }).catch(err => res.send(err.toString())));
+    }).catch(err => {
+        res.send(err.toString());
+    }));
 app.post('*/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
     workloads.blkioIntensiveWorkload(req).then(function (responses) {
         try {
