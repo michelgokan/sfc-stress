@@ -16,7 +16,7 @@ app.use(bodyParser.json({limit: '10000mb'}))
 app.use((req, res, next) => {
     // console.log(`${req.method} ${req.originalUrl}`)
     const start = process.hrtime();
-    console.log(`Received ${req.method} ${req.originalUrl} from ${req.headers['referer']} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
+    console.log(`Received ${req.method} ${req.originalUrl} from ${req.headers['referer']} [RECEIVED]`)
 
     res.on('close', () => {
         const durationInMilliseconds = getDurationInMilliseconds(start);
