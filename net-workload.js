@@ -1,7 +1,7 @@
 const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 // const addresses = "http://127.0.0.1:30005/workload/mem,http://127.0.0.1:30005/workload/cpu";
-const addresses  = process.env.NEXT_SERVICES_ADDRESSES;
-const name  = process.env.NAME;
+const addresses = process.env.NEXT_SERVICES_ADDRESSES;
+const name = process.env.NAME;
 const http = require("http");
 const urlToOptions = require("url-to-options");
 const url = require("url");
@@ -11,7 +11,7 @@ function getRequestOptions(address, payloadSize) {
     let options = urlToOptions(url_object);
     options.method = "POST";
     options.headers = {
-        'Keep-Alive': "max=" + (Number(payloadSize)+1).toString(),
+        'Keep-Alive': "max=" + (Number(payloadSize) + 1).toString(),
         'Referer': name
     };
     return options;
@@ -28,13 +28,14 @@ function sendRequest(address, payloadSize) {
         }));
     }
     req.on('error', (error) => {
-        if(error.code !== "EPIPE"){
+        if (error.code !== "EPIPE") {
             console.error(error);
             throw error;
-        } else{
+        } else {
             // console.error("EPIPE Error! Looks harmless :-)");
         }
     });
+    req.on('finish', () => console.log("Sent a request to " + address))
     req.end();
 
     return req;
@@ -56,15 +57,15 @@ function promisedSendRequest(address, payloadSize) {
                     let result = Buffer.concat(body).toString();
                     resolve(result);
                 });
-                res.on('error',(e) => {
-                   reject(e);
+                res.on('error', (e) => {
+                    reject(e);
                 });
             });
             req.on('error', (error) => {
                 reject(error);
             });
 
-            if(payloadSize !== 0) {
+            if (payloadSize !== 0) {
                 const data = require('./onemb');
 
                 for (let i = 0; i < payloadSize; i++) {
@@ -74,6 +75,7 @@ function promisedSendRequest(address, payloadSize) {
                 }
                 req.shouldKeepAlive = true;
             }
+            req.on('finish', () => console.log("Sent a request to " + address))
             req.end();
         } catch (e) {
             reject(e);

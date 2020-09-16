@@ -22,6 +22,8 @@ spec:
           env:
             - name: NEXT_SERVICES_ADDRESSES #comma separated
               value: ""
+            - name: NAME
+              value: "<NO NAME>" #set service name here
           ports:
             - containerPort: 30005
 ---
