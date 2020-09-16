@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 
     res.on('close', () => {
         const durationInMilliseconds = getDurationInMilliseconds(start);
-        console.log(`${req.method} ${req.originalUrl} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
+        console.log(`${req.method} ${req.originalUrl} from ${req.headers['referer']} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
     });
     next();
 })
