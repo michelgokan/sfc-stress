@@ -1,4 +1,4 @@
-const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
+const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 
 function executeMemWorkload(dataSize) {
     const onemb = require('./onemb');
@@ -14,7 +14,7 @@ function executeMemWorkload(dataSize) {
 if (!isMainThread) {
     let result = executeMemWorkload(workerData.paramValue);
     parentPort.postMessage(result)
-} else{
+} else {
     module.exports = {
         executeMemWorkload: executeMemWorkload
     };

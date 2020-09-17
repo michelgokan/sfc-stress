@@ -1,5 +1,4 @@
 const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
-// const addresses = "http://127.0.0.1:30005/workload/mem,http://127.0.0.1:30005/workload/cpu";
 const addresses = process.env.NEXT_SERVICES_ADDRESSES;
 const name = process.env.NAME === undefined ? "undefined" : process.env.NAME;
 const http = require("http");
@@ -70,7 +69,6 @@ function promisedSendRequest(address, payloadSize) {
                 reject(error);
             });
             req.on('finish', () => console.log("SENT - " + name + " sent a " + req.method + " request to " + address));
-            req.end();
         } catch (e) {
             reject(e);
         }
@@ -112,6 +110,5 @@ if (!isMainThread) {
 } else {
     module.exports = {
         executeNetWorkload: executeNetWorkload,
-        executePromisedNetWorkload: executePromisedNetWorkload
     };
 }

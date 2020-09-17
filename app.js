@@ -42,31 +42,43 @@ app.all('*/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, re
     }).catch(err => {
         res.send(err.toString());
     }));
-app.all('*/net/:payloadSize?', (req, res) => res.send(workloads.networkIntensiveWorkload(req, false).toString()));
-app.all('*/promisedNet/:payloadSize?', (req, res) =>
-    workloads.networkIntensiveWorkload(req, true).then(function (responses) {
-        res.send([responses.concat('<br />')]);
-    }).catch(err => {
-        res.send(err.toString());
-    }));
-app.get('*/x/:isPromised?/:sendToNext?', (req, res) => {
-    let combinedWorkloadResults = workloads.combinedWorkload(req);
-    if (combinedWorkloadResults[0]) {
-        combinedWorkloadResults[1].then(function (responses) {
-            let result = workloads.runAll(req);
-            Promise.all(result).then((responses) => {
-                res.send([responses.concat('<br />')]);
-            }).catch(err => {
-                res.send(err.toString());
-            });
+// app.all('*/net/:payloadSize?', (req, res) => res.send(workloads.networkIntensiveWorkload(req, false).toString()));
+app.all('*/net/:payloadSize?/:isPromised?', (req, res) => {
+    let networkIntensiveWorkloadResults = workloads.networkIntensiveWorkload(req);
+    if (networkIntensiveWorkloadResults[0] == true) {
+        Promise.all(networkIntensiveWorkloadResults[1]).then(function (responses) {
+            res.send(responses);
         }).catch(err => {
             res.send(err.toString());
         });
     } else {
         res.send("OK");
-        let result = workloads.runAll(req);
     }
 });
+app.get('*/x/:sendToNext?/:isPromised?', (req, res) => {
+    let results = workloads.runAll(req),
+        sendToNext = results[0], promises = results[1];
+
+    if (sendToNext == true) {
+        Promise.all(promises).then((responses) => {
+            let networkIntensiveWorkloadResults = workloads.networkIntensiveWorkload(req);
+            if (networkIntensiveWorkloadResults[0] == true) {
+                Promise.all(networkIntensiveWorkloadResults[1]).then((value) => {
+                    res.send(value);
+                }).catch(err => {
+                    res.send(err.toString());
+                });
+            } else {
+                res.send("OK");
+            }
+        }).catch(err => {
+            res.send(err.toString());
+        });
+    } else {
+        res.send("OK");
+    }
+});
+
 app.get('*/', (req, res) => res.send("Hi :)!<br />Please use one of the following endpoints:<br />* /cpu for CPU intensive workloads<br />* /mem for memory intensive workloads<br />* /disk for disk intensive workloads<br />* /net for network intensive workloads<br />* /x for combined workloads"));
 
 app.listen(30005, "0.0.0.0");

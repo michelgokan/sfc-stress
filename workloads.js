@@ -1,8 +1,4 @@
-// const req           = require("express");
-// const express       = require("express");
-// const addresses = "http://127.0.0.1:30005/workload/mem,http://127.0.0.1:30005/workload/cpu";
 const addresses = process.env.NEXT_SERVICES_ADDRESSES;
-const addressesCount = addresses.split(',').length;
 const cpuWorkload = require('./cpu-workload');
 const netWorkload = require('./net-workload');
 const memWorkload = require('./mem-workload');
@@ -60,8 +56,8 @@ function getReturnPromises(promises, req, sendToNext, payloadSize) {
 }
 
 module.exports = {
-    networkIntensiveWorkload: function (req = undefined, isPromised = false, isEmptyRequest = false, optionalPayloadSize = undefined) {
-        let payloadSize;
+    networkIntensiveWorkload: function (req = undefined, isEmptyRequest = false, optionalPayloadSize = undefined) {
+        let payloadSize, isPromised = getParameter(req, 'isPromised', false);
 
         if (isEmptyRequest) {
             payloadSize = 0;
@@ -73,61 +69,51 @@ module.exports = {
 
         if (addresses === "") return Promise.reject("Nothing executed!");
 
-        if (!isPromised) {
-            // console.log("/net called!");
-            let result = netWorkload.executeNetWorkload(payloadSize, req, isPromised);
-            return "Transmitted " + payloadSize + "MB x " + addressesCount + " = " + payloadSize * addressesCount + "MB of data from " + req.protocol + "://" + req.get('host') + req.originalUrl + " to [" + addresses + "]  using 1 thread!"
-        } else {
-            let result = netWorkload.executePromisedNetWorkload(payloadSize);
-            return result;
-        }
+        let result = netWorkload.executeNetWorkload(payloadSize, req, isPromised);
+        return [isPromised, result];
     },
-    CPUIntensiveWorkload: function (req = undefined) {
-        // console.log("/cpu called!");
+    CPUIntensiveWorkload: function (req = undefined, sendToNext = undefined) {
         let workloadSize = getParameter(req, 'workloadSize'),
             threadsCount = getParameter(req, 'threadsCount'),
-            sendToNext = getParameter(req, 'sendToNext', false) > 0,
             payloadSize = getParameter(req, 'payloadSize', -1);
+
+        sendToNext = sendToNext == undefined ? getParameter(req, 'sendToNext', false) > 0 : sendToNext;
 
         if (workloadSize == 0 || threadsCount == 0) return Promise.reject("Nothing executed!");
 
         let promises = generatePromises(workloadSize, threadsCount, "./cpu-workload.js", cpuWorkload.executeCPUWorkload);
         return getReturnPromises(promises, req, sendToNext, payloadSize);
     },
-    memoryIntensiveWorkload: function (req = undefined) {
-        // console.log("/mem called!");
+    memoryIntensiveWorkload: function (req = undefined, sendToNext = undefined) {
         let dataSize = getParameter(req, 'dataSize'),
             threadsCount = getParameter(req, 'threadsCount'),
-            sendToNext = getParameter(req, 'sendToNext', false) > 0,
             payloadSize = getParameter(req, 'payloadSize', -1);
+
+        sendToNext = sendToNext == undefined ? getParameter(req, 'sendToNext', false) > 0 : sendToNext;
 
         if (dataSize == 0 || threadsCount == 0) return Promise.reject("Nothing executed!");
 
         let promises = generatePromises(dataSize, threadsCount, "./mem-workload.js", memWorkload.executeMemWorkload)
         return getReturnPromises(promises, req, sendToNext, payloadSize);
     },
-    blkioIntensiveWorkload: function (req = undefined) {
-        // console.log("/blkio called!");
+    blkioIntensiveWorkload: function (req = undefined, sendToNext = undefined) {
         let fileSize = getParameter(req, 'fileSize'),
             threadsCount = getParameter(req, 'threadsCount'),
-            sendToNext = getParameter(req, 'sendToNext', false) > 0,
             payloadSize = getParameter(req, 'payloadSize', -1);
+
+        sendToNext = sendToNext == undefined ? getParameter(req, 'sendToNext', false) > 0 : sendToNext;
 
         if (fileSize == 0 || threadsCount == 0) return Promise.reject("Nothing executed!");
 
         let promises = generatePromises(fileSize, threadsCount, "./blkio-workload.js", blkioWorkload.executeBlkioWorkload)
         return getReturnPromises(promises, req, sendToNext, payloadSize);
     },
-    combinedWorkload: function (req) {
-        let promisedNet = getParameter(req, 'isPromised', false);
-        let result = [promisedNet, this.networkIntensiveWorkload(req, promisedNet)];
-        return result;
-    },
     runAll: function (req) {
-        let a = this.CPUIntensiveWorkload(req);
-        let b = this.memoryIntensiveWorkload(req);
-        let c = this.blkioIntensiveWorkload(req);
+        let sendToNext = getParameter(req, 'sendToNext', false) > 0,
+            cpu = this.CPUIntensiveWorkload(req, false),
+            mem = this.memoryIntensiveWorkload(req, false),
+            blkio = this.blkioIntensiveWorkload(req, false);
 
-        return [a, b, c];
+        return [sendToNext, [cpu, mem, blkio]];
     }
 };

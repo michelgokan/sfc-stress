@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
+const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 
 function checksum(str, algorithm, encoding) {
     return crypto
@@ -22,7 +22,7 @@ function executeCPUWorkload(workloadSize) {
 if (!isMainThread) {
     let result = executeCPUWorkload(workerData.paramValue);
     parentPort.postMessage(result)
-} else{
+} else {
     module.exports = {
         executeCPUWorkload: executeCPUWorkload
     };
