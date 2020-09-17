@@ -14,10 +14,10 @@ function getRequestOptions(address, payloadSize) {
     return options;
 }
 
-function getForm(payloadSize){
+function getForm(payloadSize) {
     const form = new FormData();
-    if(payloadSize){
-        const readStream = fs.createReadStream('./payload/100MB.zip', {start:0, end: payloadSize*1000});
+    if (payloadSize) {
+        const readStream = fs.createReadStream('./payload/100MB.zip', {start: 0, end: payloadSize * 1000});
         form.append('data', readStream);
     }
     return form;
@@ -57,6 +57,7 @@ function promisedSendRequest(address, payloadSize) {
                 });
                 res.on('end', function () {
                     let result = Buffer.concat(body).toString();
+                    console.log("Received " + res.method + " response from " + address + " [REQUEST END]");
                     resolve(result);
                 });
                 res.on('error', (e) => {
@@ -79,7 +80,6 @@ function executeNetWorkload(payloadSize, req, isPromised = false) {
     let splittedAddresses = addresses.split(",");
     let requests = [];
     for (let address of splittedAddresses) {
-        // promises.push(sendRequest(address))
         try {
             if (!isPromised) {
                 requests.push(sendRequest(address, payloadSize));

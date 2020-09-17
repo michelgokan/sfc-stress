@@ -14,7 +14,6 @@ const getDurationInMilliseconds = (start) => {
 app.use(bodyParser.json({limit: '10000mb'}))
 
 app.use((req, res, next) => {
-    // console.log(`${req.method} ${req.originalUrl}`)
     const start = process.hrtime();
     console.log(`Received ${req.method} ${req.originalUrl} from ${req.headers['referer']} [RECEIVED]`)
 
@@ -42,7 +41,6 @@ app.all('*/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, re
     }).catch(err => {
         res.send(err.toString());
     }));
-// app.all('*/net/:payloadSize?', (req, res) => res.send(workloads.networkIntensiveWorkload(req, false).toString()));
 app.all('*/net/:payloadSize?/:isPromised?', (req, res) => {
     let networkIntensiveWorkloadResults = workloads.networkIntensiveWorkload(req);
     if (networkIntensiveWorkloadResults[0] == true) {

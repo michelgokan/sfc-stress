@@ -4,12 +4,11 @@ Synthetic Service Mesh is a customizable, multi-threaded, and Docker/Kubernetes 
 ![Image of a service chain](./images/service_chain.png)
 
 # Endpoints:
-* /workload/cpu/:workloadSize?/:threadsCount?/:sendToNext? for CPU intensive workloads
-* /workload/mem/:dataSize?/:threadsCount?/:sendToNext? for memory intensive workloads
-* /workload/blkio/:fileSize?/:threadsCount?/:sendToNext? for disk intensive workloads
-* /workload/net/:payloadSize? for network intensive workloads
-* /workload/promisedNet/:payloadSize? for network intensive workloads
-* /x/:isPromised?/:sendToNext? for combined workloads
+* */cpu/:workloadSize?/:threadsCount?/:sendToNext? for CPU intensive workloads
+* */mem/:dataSize?/:threadsCount?/:sendToNext? for memory intensive workloads
+* */blkio/:fileSize?/:threadsCount?/:sendToNext? for disk intensive workloads
+* */net/:payloadSize?/:isPromised? for network intensive workloads
+* */x/:sendToNext?/:isPromised? for combined workloads
 
 
 ## CPU Intensive Workload: 
@@ -24,6 +23,8 @@ It comes in 2 types:
  
 1. **Normal mode:** Send request and exit!
 2. **Promised mode:** Send request, wait for the response, and then exit!
+
+To enable promised-mode, pass 1 to isPromised parameter in */net or */x.
 
 ## Combined Workload: 
 Run all workloads mentioned above once!
