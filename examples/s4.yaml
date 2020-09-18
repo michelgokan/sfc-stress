@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: s4
+  namespace: ingress-nginx
+  labels:
+    app: s4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s4
+  template:
+    metadata:
+      labels:
+        app: s4
+        namespace: ingress-nginx
+    spec:
+      containers:
+        - name: s4
+          image: michelgokan/synthetic-service-mesh
+          env:
+            - name: NEXT_SERVICES_ADDRESSES
+              value: "http://172.16.16.111:30553/s5/x/1/1"
+            - name: NAME
+              value: "s4"
+          ports:
+            - containerPort: 30005
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: s4
+  namespace: ingress-nginx
+  labels:
+    app: synthetic-service-mesh
+spec:
+  ports:
+  - port: 30008
+    targetPort: 30005
+    protocol: TCP
+    name: http
+  selector:
+    app: s4
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: s4
+  namespace: ingress-nginx
+  annotations:
+     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+     nginx.ingress.kubernetes.io/proxy-body-size: "10000m"
+     nginx.org/client-max-body-size: "10000m" 
+spec:
+  tls:
+    - secretName: tls-certificate
+  rules:
+    - http:
+        paths:
+          - path: /s4
+            backend:
+              serviceName: s4
+              servicePort: 30005

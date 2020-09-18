@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: s6
+  namespace: ingress-nginx
+  labels:
+    app: s6
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s6
+  template:
+    metadata:
+      labels:
+        app: s6
+        namespace: ingress-nginx
+    spec:
+      containers:
+        - name: s6
+          image: michelgokan/synthetic-service-mesh
+          env:
+            - name: NEXT_SERVICES_ADDRESSES
+              value: ""
+            - name: NAME
+              value: "s6"
+          ports:
+            - containerPort: 30005
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: s6
+  namespace: ingress-nginx
+  labels:
+    app: synthetic-service-mesh
+spec:
+  ports:
+  - port: 30010
+    targetPort: 30005
+    protocol: TCP
+    name: http
+  selector:
+    app: s6
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: s6
+  namespace: ingress-nginx
+  annotations:
+     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+     nginx.ingress.kubernetes.io/proxy-body-size: "10000m"
+     nginx.org/client-max-body-size: "10000m" 
+spec:
+  tls:
+    - secretName: tls-certificate
+  rules:
+    - http:
+        paths:
+          - path: /s6
+            backend:
+              serviceName: s6
+              servicePort: 30005

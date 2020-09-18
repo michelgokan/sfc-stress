@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: s7
+  namespace: ingress-nginx
+  labels:
+    app: s7
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s7
+  template:
+    metadata:
+      labels:
+        app: s7
+        namespace: ingress-nginx
+    spec:
+      containers:
+        - name: s7
+          image: michelgokan/synthetic-service-mesh
+          env:
+            - name: NEXT_SERVICES_ADDRESSES
+              value: "http://172.16.16.111:30553/s8/blkio"
+            - name: NAME
+              value: "s7"
+          ports:
+            - containerPort: 30005
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: s7
+  namespace: ingress-nginx
+  labels:
+    app: synthetic-service-mesh
+spec:
+  ports:
+  - port: 30011
+    targetPort: 30005
+    protocol: TCP
+    name: http
+  selector:
+    app: s7
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: s7
+  namespace: ingress-nginx
+  annotations:
+     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+     nginx.ingress.kubernetes.io/proxy-body-size: "10000m"
+     nginx.org/client-max-body-size: "10000m" 
+spec:
+  tls:
+    - secretName: tls-certificate
+  rules:
+    - http:
+        paths:
+          - path: /s7
+            backend:
+              serviceName: s7
+              servicePort: 30005
