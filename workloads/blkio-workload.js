@@ -9,7 +9,7 @@ function getRandomInt(max) {
 function executeBlkioWorkload(fileSize) {
     const file_suffix = getRandomInt(99999999);
     const file_name = "/tmp/test" + file_suffix;
-    const onemb = require('./onemb');
+    const onemb = require('./payload/onemb');
 
     for (let i = 0; i < fileSize; i++) {
         fs.appendFileSync(file_name, onemb);

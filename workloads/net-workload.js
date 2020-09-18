@@ -17,7 +17,7 @@ function getRequestOptions(address, payloadSize) {
 function getForm(payloadSize) {
     const form = new FormData();
     if (payloadSize) {
-        const readStream = fs.createReadStream('./payload/100MB.zip', {start: 0, end: payloadSize * 1000});
+        const readStream = fs.createReadStream('./workloads/payload/100MB.zip', {start: 0, end: payloadSize * 1000});
         form.append('data', readStream);
     }
     return form;

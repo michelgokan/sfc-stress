@@ -1,24 +1,17 @@
 const express = require('express');
 const app = express();
-var bodyParser = require('body-parser')
-let workloads = require("./workloads");
+const bodyParser = require('body-parser');
+let workloads = require("./workloads/workloads");
+const helper = require("./workloads/helper");
 
-const getDurationInMilliseconds = (start) => {
-    const NS_PER_SEC = 1e9;
-    const NS_TO_MS = 1e6;
-    const diff = process.hrtime(start);
-
-    return (diff[0] * NS_PER_SEC + diff[1]) / NS_TO_MS;
-}
-
-app.use(bodyParser.json({limit: '10000mb'}))
-
+app.use(bodyParser.json({limit: '10000mb'}));
+app.use('/images', express.static('images'));
 app.use((req, res, next) => {
     const start = process.hrtime();
     console.log(`Received ${req.method} ${req.originalUrl} from ${req.headers['referer']} [RECEIVED]`)
 
     res.on('close', () => {
-        const durationInMilliseconds = getDurationInMilliseconds(start);
+        const durationInMilliseconds = helper.getDurationInMilliseconds(start);
         console.log(`Closed received ${req.method} ${req.originalUrl} from ${req.headers['referer']} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
     });
     next();
@@ -77,6 +70,12 @@ app.get('*/x/:sendToNext?/:isPromised?', (req, res) => {
     }
 });
 
-app.get('*/', (req, res) => res.send("Hi :)!<br />Please use one of the following endpoints:<br />* /cpu for CPU intensive workloads<br />* /mem for memory intensive workloads<br />* /disk for disk intensive workloads<br />* /net for network intensive workloads<br />* /x for combined workloads"));
+app.get('*/', (req, res) => {
+    const showdown = require('showdown');
+    const fs = require('fs');
+    const converter = new showdown.Converter();
+    const text = fs.readFileSync('./README.md', 'utf8');
+    res.send(converter.makeHtml(text));
+});
 
 app.listen(30005, "0.0.0.0");

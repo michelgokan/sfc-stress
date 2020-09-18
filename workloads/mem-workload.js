@@ -1,7 +1,7 @@
 const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 
 function executeMemWorkload(dataSize) {
-    const onemb = require('./onemb');
+    const onemb = require('./payload/onemb');
 
     let bigStrArray = [];
     for (let i = 0; i < dataSize; i++) {
