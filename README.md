@@ -3,7 +3,7 @@ Synthetic Service Mesh is a customizable, multi-threaded, and Docker/Kubernetes 
 
 ![Image of a service chain](./images/service_chain.png)
 
-You can use yaml files inside the `example` folder to generate service mesh above (or use them as an example for your own custom service mesh). To start the traffic, you should send a GET request/call /s1/cpu/1/1/1. It will then send a single request to s1 and then s1 send the traffic to s2, s2 to s3 and s7 and so on.
+You can use yaml files inside the `examples` folder to deplot service mesh above on the Kubernetes (or use them as an example for your own custom service mesh). To start the traffic, you should send a GET request to /s1/cpu/1/1/1. It will then send a single request to s1 and then s1 send the traffic to s2, s2 to s3 and s7 and so on.
 
 # Endpoints:
 * */cpu/:workloadSize?/:threadsCount?/:sendToNext? for CPU intensive workloads
