@@ -4,16 +4,18 @@ metadata:
   name: s3
   namespace: ingress-nginx
   labels:
-    app: s3
+    name: s3
+    app: synthetic-service-mesh
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: s3
+      name: s3
   template:
     metadata:
       labels:
-        app: s3
+        app: synthetic-service-mesh
+        name: s3
         namespace: ingress-nginx
     spec:
       containers:
@@ -33,6 +35,7 @@ metadata:
   name: s3
   namespace: ingress-nginx
   labels:
+    name: s3
     app: synthetic-service-mesh
 spec:
   ports:
@@ -41,7 +44,7 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: s3
+    name: s3
 
 ---
 apiVersion: extensions/v1beta1

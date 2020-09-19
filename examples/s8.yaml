@@ -4,16 +4,18 @@ metadata:
   name: s8
   namespace: ingress-nginx
   labels:
-    app: s8
+    name: s8
+    app: synthetic-service-mesh
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: s8
+      name: s8
   template:
     metadata:
       labels:
-        app: s8
+        app: synthetic-service-mesh
+        name: s8
         namespace: ingress-nginx
     spec:
       containers:
@@ -33,6 +35,7 @@ metadata:
   name: s8
   namespace: ingress-nginx
   labels:
+    name: s8
     app: synthetic-service-mesh
 spec:
   ports:
@@ -41,7 +44,7 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: s8
+    name: s8
 
 ---
 apiVersion: extensions/v1beta1

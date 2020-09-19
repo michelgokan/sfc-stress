@@ -4,16 +4,18 @@ metadata:
   name: s6
   namespace: ingress-nginx
   labels:
-    app: s6
+    name: s6
+    app: synthetic-service-mesh
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: s6
+      name: s6
   template:
     metadata:
       labels:
-        app: s6
+        app: synthetic-service-mesh
+        name: s6
         namespace: ingress-nginx
     spec:
       containers:
@@ -34,6 +36,7 @@ metadata:
   namespace: ingress-nginx
   labels:
     app: synthetic-service-mesh
+    name: s6
 spec:
   ports:
   - port: 30010
@@ -41,7 +44,7 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: s6
+    name: s6
 
 ---
 apiVersion: extensions/v1beta1

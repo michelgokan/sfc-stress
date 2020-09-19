@@ -4,17 +4,19 @@ metadata:
   name: s7
   namespace: ingress-nginx
   labels:
-    app: s7
+    name: s7
+    app: synthetic-service-mesh
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: s7
+      name: s7
   template:
     metadata:
       labels:
-        app: s7
+        app: synthetic-service-mesh
         namespace: ingress-nginx
+        name: s7
     spec:
       containers:
         - name: s7
@@ -33,6 +35,7 @@ metadata:
   name: s7
   namespace: ingress-nginx
   labels:
+    name: s7
     app: synthetic-service-mesh
 spec:
   ports:
@@ -41,7 +44,7 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: s7
+    name: s7
 
 ---
 apiVersion: extensions/v1beta1

@@ -4,17 +4,19 @@ metadata:
   name: s5
   namespace: ingress-nginx
   labels:
-    app: s5
+    app: synthetic-service-mesh
+    name: s5
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: s5
+      name: s5
   template:
     metadata:
       labels:
-        app: s5
+        app: synthetic-service-mesh
         namespace: ingress-nginx
+        name: s5
     spec:
       containers:
         - name: s5
@@ -34,6 +36,7 @@ metadata:
   namespace: ingress-nginx
   labels:
     app: synthetic-service-mesh
+    name: s5
 spec:
   ports:
   - port: 30009
@@ -41,7 +44,7 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: s5
+    name: s5
 
 ---
 apiVersion: extensions/v1beta1
