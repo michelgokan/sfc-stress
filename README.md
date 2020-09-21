@@ -40,4 +40,13 @@ Make sure you installed following packages on ALL kubernetes nodes:
 ```
 $ sudo apt-get install jq sshpass reptyr linux-tools-common linux-tools-generic linux-tools-`uname -r`
 ```
+
+Then, in order to enable `perf` syscalls, we should enable `perf_event_open` syscal through `seccomps`. There is a configmap in `examples/seccomp/seccomp-profile.yaml` and corresponding DeamonSet in `examples/seccomp/seccomp-installer.yaml`. Run followings to install both:
+
+```
+kubectl apply -f examples/seccomp/seccomp-profile.yaml
+kubectl apply -f examples/seccomp/seccomp-installer.yaml
+```
+
+And then run s1-s8 yaml files.
 [to be continued...]

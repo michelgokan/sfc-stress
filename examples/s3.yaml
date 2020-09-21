@@ -17,6 +17,8 @@ spec:
         app: synthetic-service-mesh
         name: s3
         namespace: ingress-nginx
+      annotations:
+        seccomp.security.alpha.kubernetes.io/pod: "localhost/my-profile.json"
     spec:
       containers:
         - name: s3
@@ -28,6 +30,8 @@ spec:
               value: "s3"
           ports:
             - containerPort: 30005
+          securityContext:
+            allowPrivilegeEscalation: true
 ---
 apiVersion: v1
 kind: Service
