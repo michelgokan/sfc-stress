@@ -38,6 +38,6 @@ Simply use `kubectl apply -f synthetic-service-mesh.yaml` and access via `http:/
 Make sure you installed following packages on ALL kubernetes nodes:
 
 ```
-$ sudo apt-get install jq sshpass linux-tools-common linux-tools-generic linux-tools-`uname -r`
+$ sudo apt-get install jq sshpass reptyr linux-tools-common linux-tools-generic linux-tools-`uname -r`
 ```
 [to be continued...]
