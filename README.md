@@ -33,3 +33,11 @@ Run all workloads mentioned above once!
 
 # Installation on Kubernetes
 Simply use `kubectl apply -f synthetic-service-mesh.yaml` and access via `http://<your_nginx_address>/workload/`. Make sure to set NEXT_SERVICES_ADDRESSES environment variable in the yaml file for the network intensive workload and/or for properly forming your service mesh graph.
+
+# Evaluations
+Make sure you installed following packages on ALL kubernetes nodes:
+
+```
+$ sudo apt-get install jq sshpass linux-tools-common linux-tools-generic linux-tools-`uname -r`
+```
+[to be continued...]
