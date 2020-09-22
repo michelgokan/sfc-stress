@@ -30,8 +30,6 @@ spec:
               value: "s1"
           ports:
             - containerPort: 30005
-          securityContext:
-            allowPrivilegeEscalation: true
 ---
 apiVersion: v1
 kind: Service

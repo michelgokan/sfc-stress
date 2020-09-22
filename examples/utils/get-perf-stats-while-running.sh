@@ -1,7 +1,14 @@
 #!/bin/bash
+ROOTPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../ && pwd -P )"
+if [ $# -ne 2 ]
+  then
+    echo "Please enter service name (first argument) and then namespace (second argument)"
+    exit 0
+fi
+
 # Read config file
-source <(grep = <(grep -A5 '\[general\]' config.ini))
-source <(grep = <(grep -A5 '\[root-password-for-ssh\]' config.ini))
+source <(grep = <(grep -A5 '\[general\]' $ROOTPATH/examples/utils/config.ini))
+source <(grep = <(grep -A5 '\[root-password-for-ssh\]' $ROOTPATH/examples/utils/config.ini))
 
 deploymentName=$1
 deploymentNamespace=$2
@@ -14,11 +21,14 @@ podNodeIP=${podNodeDetails[1]}
 podNodePass="${!podNodeName}"
 dockerPSInPodNode=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} 'docker ps')
 podsContainers=$(echo "$dockerPSInPodNode" | grep "$podName")
-mainPodContainerID=$(echo "$podsContainers" | sed '1q;d' | awk "{print \$1}")
-pausePodContainerID=$(echo "$podsContainers" | sed '2q;d' | awk "{print \$1}")
-mainPodContainerPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "docker inspect -f '{{.State.Pid}}' $mainPodContainerID" | sed 's/[^0-9]*//g')
-pausePodContainerPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "docker inspect -f '{{.State.Pid}}' $pausePodContainerID" | sed 's/[^0-9]*//g')
+mainContainerID=$(echo "$podsContainers" | sed '1q;d' | awk "{print \$1}")
+pauseContainerID=$(echo "$podsContainers" | sed '2q;d' | awk "{print \$1}")
+mainContainerPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "docker inspect -f '{{.State.Pid}}' $mainContainerID" | sed 's/[^0-9]*//g')
+pauseContainerPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "docker inspect -f '{{.State.Pid}}' $pauseContainerID" | sed 's/[^0-9]*//g')
 
+echo "$podName is placed on $podNodeName with address $podNodeIP..."
+echo "It has 2 containers with image ID $mainContainerID and $pauseContainerID..."
+echo "The PID of the first pod is $mainContainerPID and the second one is $pauseContainerPID..."
 
 # Network Part 
 echo "Entre the path of the workload that you want to initiate traffic (e.g. s1/cpu/1/1/1): "
@@ -27,17 +37,13 @@ fullPath="$baseURL$path"
 echo "Sending a single request to " $fullPath
 epochTime=$(date +%s%3N)
 perfLogPath="/tmp/trace-$epochTime-$podName.log"
-echo "Running perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p $mainPodContainerPID,$pausePodContainerPID -o $perfLogPath"
-perfPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "screen -S $epochTime-$podName  -d -m perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p $mainPodContainerPID,$pausePodContainerPID -o $perfLogPath
+echo "Running perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\") -o $perfLogPath"
+perfPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "screen -S $epochTime-$podName  -d -m perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\") -o $perfLogPath
 perl -e \"select(undef,undef,undef,0.01);\"
 screenPID=\$(screen -ls | awk '/\\.$epochTime-$podName\\t/ {printf(\"%d\", strtonum(\$1))}')
 pgrep -P \$screenPID perf" | sed 's/[^0-9]*//g' | tr -d '\n')
-#echo "$finalPerfCMD"
-#perfPID=eval "$finalPerfCMD"
-### echo \$!
-### )" | sed 's/[^0-9]*//g')
 curl $fullPath
-echo $perfPID
+echo ""
 perfLog=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "(
  perl -e \"select(undef,undef,undef,0.01);\"
  kill -INT $perfPID
@@ -45,16 +51,3 @@ perfLog=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "
  cat $perfLogPath
 )")
 echo "$perfLog"
-#$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "perf stati --snapshot --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p $mainPodContainerPID,$pausePodContainerPID" )
-#echo $mainPodContainerID
-#echo $pausePodContainerID
-#echo "$dockerPSInPodNode"
-#echo "$podName"
-#echo "$podsContainers"
-#IFS='
-#'
-#for pod in $pods
-#do
-#   echo "$pod"
-#done
-#  | tail -n 1 | awk "{print \$1 system(\"kubectl describe pod $1 -n $2| grep Node:\")}")
