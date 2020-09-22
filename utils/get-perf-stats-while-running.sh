@@ -1,5 +1,5 @@
 #!/bin/bash
-ROOTPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../ && pwd -P )"
+ROOTPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../ && pwd -P )"
 if [ $# -ne 4 ]
   then
     echo "Please enter service name (first argument), namespace (second argument), path of the workload that you want to initiate traffic (e.g. s1/cpu/1/1/1), and finally a suffix for .log files (forth argument)."
@@ -7,8 +7,8 @@ if [ $# -ne 4 ]
 fi
 
 # Read config file
-source <(grep = <(grep -A5 '\[general\]' $ROOTPATH/examples/utils/config.ini))
-source <(grep = <(grep -A5 '\[root-password-for-ssh\]' $ROOTPATH/examples/utils/config.ini))
+source <(grep = <(grep -A5 '\[general\]' $ROOTPATH/utils/config.ini))
+source <(grep = <(grep -A5 '\[root-password-for-ssh\]' $ROOTPATH/utils/config.ini))
 
 deploymentName=$1
 deploymentNamespace=$2
@@ -37,7 +37,7 @@ echo "Sending a single request to " $fullPath
 epochTime=$(date +%s%3N)
 perfLogPath="/tmp/trace-$epochTime-$podName.log"
 echo "Transfering thread-place-on-runqueues.sh to $podNodeName:/tmp ..."
-sshpass -p ${podNodePass} scp $ROOTPATH/examples/utils/thread-place-on-runqueues.sh root@${podNodeIP}:/tmp
+sshpass -p ${podNodePass} scp $ROOTPATH/utils/thread-place-on-runqueues.sh root@${podNodeIP}:/tmp
 
 
 echo "Running perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\") -o $perfLogPath"
@@ -94,6 +94,6 @@ echo "$csvData" > perfLogs-$4.log
 kubectl logs s1-86dc754fb-lg7lx -n ingress-nginx | tail -1 | tr -d , | awk '{print $8*1000000}' > latency-$4.log
 
 echo ""
-echo "Transfering $root@${podNodeIP}:/tmp/runqueues.log to $ROOTPATH/examples/utils/ ..."
-sshpass -p ${podNodePass} rsync -avz --remove-source-files -e ssh root@${podNodeIP}:/tmp/runqueues.log $ROOTPATH/examples/utils/
-mv $ROOTPATH/examples/utils/runqueues.log $ROOTPATH/examples/utils/runqueues-$4.log 
+echo "Transfering $root@${podNodeIP}:/tmp/runqueues.log to $ROOTPATH/utils/ ..."
+sshpass -p ${podNodePass} rsync -avz --remove-source-files -e ssh root@${podNodeIP}:/tmp/runqueues.log $ROOTPATH/utils/
+mv $ROOTPATH/utils/runqueues.log $ROOTPATH/utils/runqueues-$4.log 
