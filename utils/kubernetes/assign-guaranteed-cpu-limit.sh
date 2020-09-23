@@ -1,6 +1,5 @@
 #!/bin/bash
-ROOTPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../../ && pwd -P )"
-source $ROOTPATH/src/init.sh
+ROOTPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../ && pwd -P )"
 
 #Check if arguments entered
 if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]
@@ -28,8 +27,8 @@ spec:
             cpu: $cpu_limit
 EOT
 
-#kube_result1=$(kubectl "${k8s_args[@]}" patch deployment $1 --namespace $2 --type json -p "[{\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/limits/cpu\", \"value\": \"$cpu_limit\"}]")
 kube_result1=$(kubectl "${k8s_args[@]}" patch deployment $1 --namespace $2 --patch "$(cat $ROOTPATH/.patch.resource.temp.$rand_number)")
+cat $ROOTPATH/.patch.resource.temp.$rand_number
 rm $ROOTPATH/.patch.resource.temp.$rand_number
 
 echo "$kube_result1"

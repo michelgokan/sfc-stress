@@ -1,0 +1,10 @@
+spec:
+  template:
+    spec:
+      containers:
+      - name: $deployment_name
+        resources:
+          limits:
+            cpu: $cpu_limit
+          requests:
+            cpu: $cpu_limit

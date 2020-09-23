@@ -5,6 +5,7 @@ if [ $# -ne 4 ]
     echo "Please enter service name (first argument), namespace (second argument), path of the workload that you want to initiate traffic (e.g. s1/cpu/1/1/1), and finally a suffix for .log files (forth argument)."
     exit 0
 fi
+mkdir $ROOTPATH/logs
 
 # Read config file
 source <(grep = <(grep -A5 '\[general\]' $ROOTPATH/utils/config.ini))
@@ -29,7 +30,6 @@ pauseContainerPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${po
 echo "$podName is placed on $podNodeName with address $podNodeIP..."
 echo "It has 2 containers with image ID $mainContainerID and $pauseContainerID..."
 echo "The PID of the first pod is $mainContainerPID and the second one is $pauseContainerPID..."
-
 # Network Part 
 path=$3
 fullPath="$baseURL$path"
@@ -40,11 +40,12 @@ echo "Transfering thread-place-on-runqueues.sh to $podNodeName:/tmp ..."
 sshpass -p ${podNodePass} scp $ROOTPATH/utils/thread-place-on-runqueues.sh root@${podNodeIP}:/tmp
 
 
-echo "Running perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\") -o $perfLogPath"
 echo "Running /tmp/thread-place-on-runqueues.sh \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\")"
 
 sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "screen -S $epochTime-threadMonitor-$podName  -d -m /tmp/thread-place-on-runqueues.sh \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\")"
+echo "Press any key..."
 
+echo "Running perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\") -o $perfLogPath"
 perfPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "screen -S $epochTime-$podName  -d -m perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\") -o $perfLogPath
 perl -e \"select(undef,undef,undef,0.01);\"
 screenPID=\$(screen -ls | awk '/\\.$epochTime-$podName\\t/ {printf(\"%d\", strtonum(\$1))}')
@@ -57,6 +58,7 @@ perfLog=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "
  kill -INT $perfPID
  perl -e \"select(undef,undef,undef,0.01);\"
  cat $perfLogPath
+ rm -Rf $perfLogPath
 )")
 echo "$perfLog"
 
@@ -90,10 +92,10 @@ processesList=$(getCSV "$instructions" | awk -F',' '{print $1}')
 
 csvData=$(paste -d, <(echo "$processesList") <(echo "$processedInsts") <(echo "$processedCycles") <(echo "$processedCacheMisses") <(echo "$processedContextSwitches") <(echo "$processedCpuMigrations") <(echo "$processedCpuClock") <(echo "$processedTaskClock") <(echo "$processedDurationTime"))
 csvData=$(echo "task,insts,cycles,cache-misses,context-switches,cpu-migrations,cpu-clock,task-clock,duration-time" && echo "$csvData")
-echo "$csvData" > perfLogs-$4.log
-kubectl logs s1-86dc754fb-lg7lx -n ingress-nginx | tail -1 | tr -d , | awk '{print $8*1000000}' > latency-$4.log
+echo "$csvData" > $ROOTPATH/logs/perfLogs-$4.log
+kubectl logs $podName -n $deploymentNamespace | tail -1 | tr -d , | awk '{print $8*1000000}' > $ROOTPATH/logs/latency-$4.log
 
 echo ""
 echo "Transfering $root@${podNodeIP}:/tmp/runqueues.log to $ROOTPATH/utils/ ..."
-sshpass -p ${podNodePass} rsync -avz --remove-source-files -e ssh root@${podNodeIP}:/tmp/runqueues.log $ROOTPATH/utils/
-mv $ROOTPATH/utils/runqueues.log $ROOTPATH/utils/runqueues-$4.log 
+sshpass -p ${podNodePass} rsync -avz --remove-source-files -e ssh root@${podNodeIP}:/tmp/runqueues.log $ROOTPATH/logs/
+mv $ROOTPATH/logs/runqueues.log $ROOTPATH/logs/runqueues-$4.log 

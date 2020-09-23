@@ -1,6 +1,5 @@
 #!/bin/bash
-ROOTPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../../ && pwd -P )"
-source $ROOTPATH/src/init.sh
+ROOTPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../../ && pwd -P )"
 
 if [ -z "$1" ]
 then
