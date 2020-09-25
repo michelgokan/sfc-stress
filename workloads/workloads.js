@@ -31,7 +31,7 @@ module.exports = {
 
         if (workloadSize == 0 || threadsCount == 0) return Promise.reject("Nothing executed!");
 
-        let promises = helper.generatePromises(workloadSize, threadsCount, "./cpu-workload.js", cpuWorkload.executeCPUWorkload);
+        let promises = helper.generatePromises(workloadSize, threadsCount, "./workloads/cpu-workload.js", cpuWorkload.executeCPUWorkload);
         return helper.getReturnPromises(promises, req, sendToNext, payloadSize, this.networkIntensiveWorkload);
     },
     memoryIntensiveWorkload: function (req = undefined, sendToNext = undefined) {
@@ -43,7 +43,7 @@ module.exports = {
 
         if (dataSize == 0 || threadsCount == 0) return Promise.reject("Nothing executed!");
 
-        let promises = helper.generatePromises(dataSize, threadsCount, "./mem-workload.js", memWorkload.executeMemWorkload)
+        let promises = helper.generatePromises(dataSize, threadsCount, "./workloads/mem-workload.js", memWorkload.executeMemWorkload)
         return helper.getReturnPromises(promises, req, sendToNext, payloadSize, this.networkIntensiveWorkload);
     },
     blkioIntensiveWorkload: function (req = undefined, sendToNext = undefined) {
@@ -55,7 +55,7 @@ module.exports = {
 
         if (fileSize == 0 || threadsCount == 0) return Promise.reject("Nothing executed!");
 
-        let promises = helper.generatePromises(fileSize, threadsCount, "./blkio-workload.js", blkioWorkload.executeBlkioWorkload)
+        let promises = helper.generatePromises(fileSize, threadsCount, "./workloads/blkio-workload.js", blkioWorkload.executeBlkioWorkload)
         return helper.getReturnPromises(promises, req, sendToNext, payloadSize, this.networkIntensiveWorkload);
     },
     runAll: function (req) {
