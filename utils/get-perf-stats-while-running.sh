@@ -40,13 +40,13 @@ echo "Transfering thread-place-on-runqueues.sh to $podNodeName:/tmp ..."
 sshpass -p ${podNodePass} scp $ROOTPATH/utils/thread-place-on-runqueues.sh root@${podNodeIP}:/tmp
 
 
-echo "Running /tmp/thread-place-on-runqueues.sh \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\")"
+echo "Running /tmp/thread-place-on-runqueues.sh \$(pgrep --ns $mainContainerPID -w | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID -w | paste -s -d \",\")"
 
-sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "screen -S $epochTime-threadMonitor-$podName  -d -m /tmp/thread-place-on-runqueues.sh \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\")"
+sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "screen -S $epochTime-threadMonitor-$podName  -d -m /tmp/thread-place-on-runqueues.sh \$(pgrep --ns $mainContainerPID -w | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID -w | paste -s -d \",\")"
 echo "Press any key..."
 
-echo "Running perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\") -o $perfLogPath"
-perfPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "screen -S $epochTime-$podName  -d -m perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p \$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\") -o $perfLogPath
+echo "Running perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p \$(pgrep --ns $mainContainerPID -w | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID -w | paste -s -d \",\") -o $perfLogPath"
+perfPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "screen -S $epochTime-$podName  -d -m perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -t \$(pgrep --ns $mainContainerPID -w | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID -w | paste -s -d \",\") -o $perfLogPath
 perl -e \"select(undef,undef,undef,0.01);\"
 screenPID=\$(screen -ls | awk '/\\.$epochTime-$podName\\t/ {printf(\"%d\", strtonum(\$1))}')
 pgrep -P \$screenPID perf" | sed 's/[^0-9]*//g' | tr -d '\n')
@@ -61,7 +61,6 @@ perfLog=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "
  rm -Rf $perfLogPath
 )")
 echo "$perfLog"
-
 
 ##### Processing logs
 threadsCount=$(echo "$instructions" | wc -l)
@@ -99,3 +98,5 @@ echo ""
 echo "Transfering $root@${podNodeIP}:/tmp/runqueues.log to $ROOTPATH/utils/ ..."
 sshpass -p ${podNodePass} rsync -avz --remove-source-files -e ssh root@${podNodeIP}:/tmp/runqueues.log $ROOTPATH/logs/
 mv $ROOTPATH/logs/runqueues.log $ROOTPATH/logs/runqueues-$4.log 
+
+echo "$perfLog" > $ROOTPATH/logs/perfRawLogs-$4.log

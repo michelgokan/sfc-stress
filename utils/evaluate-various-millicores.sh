@@ -9,7 +9,7 @@ fi
 
 mkdir $ROOTPATH/logs
 startCpu=100
-endCpu=4000
+endCpu=1900
 stepCpu=100
 currentCpu=0
 
