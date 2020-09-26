@@ -8,7 +8,6 @@ const helper = require("./workloads/helper");
 app.use(bodyParser.json({limit: '10000mb'}));
 app.use('/images', express.static('images'));
 app.use((req, res, next) => {
-    helper.msleep(1000);
     const start = process.hrtime();
     console.log(`Received ${req.method} ${req.originalUrl} from ${req.headers['referer']} [RECEIVED]`)
 
