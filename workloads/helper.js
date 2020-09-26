@@ -33,7 +33,8 @@ module.exports = {
                 }));
             }
         }
-
+        console.log("START PERF")
+        this.msleep(1);
         return promises;
     },
     getReturnPromises: function (promises, req, sendToNext, payloadSize, sendToNextFunc) {
