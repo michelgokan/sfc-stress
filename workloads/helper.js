@@ -1,6 +1,9 @@
 const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 
 module.exports = {
+    msleep: function (ms) {
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+    },
     getParameter: function (req, name, defaultValue = 1) {
         let param;
         if (req === undefined || req.params === undefined || req.params[name] === undefined)
