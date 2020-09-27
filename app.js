@@ -49,9 +49,15 @@ app.all('*/net/:payloadSize?/:isPromised?', (req, res) => {
     }
 });
 app.get('*/x/:sendToNext?/:isPromised?', (req, res) => {
-    let results = workloads.runAll(req),
-        sendToNext = results[0], promises = results[1];
-    console.log("Inside X1...");
+    console.log("Inside X1 Before runall...");
+
+    let results = workloads.runAll(req);
+
+    console.log("Inside X1 After runall...");
+
+    let sendToNext = results[0], promises = results[1];
+
+    console.log("Inside X1 After assignment...");
 
     if (sendToNext == true) {
         Promise.all(promises).then((responses) => {
