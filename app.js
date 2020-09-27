@@ -4,16 +4,17 @@ const app = express();
 const bodyParser = require('body-parser');
 let workloads = require("./workloads/workloads");
 const helper = require("./workloads/helper");
+const now = require('nano-time');
 
 app.use(bodyParser.json({limit: '10000mb'}));
 app.use('/images', express.static('images'));
 app.use((req, res, next) => {
     const start = process.hrtime();
-    console.log(`Received ${req.method} ${req.originalUrl} from ${req.headers['referer']} [RECEIVED]`)
+    console.log(`Received ${req.method} ${req.originalUrl} from ${req.headers['referer']} at {${now()}} [RECEIVED]`)
 
     res.on('close', () => {
         const durationInMilliseconds = helper.getDurationInMilliseconds(start);
-        console.log(`Closed received ${req.method} ${req.originalUrl} from ${req.headers['referer']} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
+        console.log(`Closed received ${req.method} ${req.originalUrl} from ${req.headers['referer']} {${now()}} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
     });
     next();
 })

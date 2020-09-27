@@ -14,6 +14,7 @@
     "form-data": "^3.0.0",
     "fs": "0.0.1-security",
     "malloc": "latest",
+    "nano-time": "^1.0.0",
     "showdown": "^1.9.1",
     "sync-request": "^6.1.0",
     "url": "^0.11.0",
