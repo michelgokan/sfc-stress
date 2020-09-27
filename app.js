@@ -48,7 +48,7 @@ app.all('*/net/:payloadSize?/:isPromised?', (req, res) => {
         res.send("OK");
     }
 });
-app.get('*/x/:sendToNext?/:isPromised?', (req, res) => {
+app.all('*/x/:sendToNext?/:isPromised?', (req, res) => {
     console.log("Inside X1 Before runall...");
 
     let results = workloads.runAll(req);
