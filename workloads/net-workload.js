@@ -24,6 +24,8 @@ function getForm(payloadSize) {
 }
 
 function sendRequest(address, payloadSize) {
+    console.log("Inside sendRequest..." + address);
+
     let options = getRequestOptions(address, payloadSize);
     const form = getForm(payloadSize);
     options.headers = form.getHeaders();
@@ -45,6 +47,8 @@ function sendRequest(address, payloadSize) {
 }
 
 function promisedSendRequest(address, payloadSize) {
+    console.log("Inside promisedSendRequest..." + address);
+
     return new Promise(function (resolve, reject) {
         try {
             let options = getRequestOptions(address, payloadSize);
@@ -77,11 +81,12 @@ function promisedSendRequest(address, payloadSize) {
 }
 
 function executeNetWorkload(payloadSize, req, isPromised = false) {
+    console.log("Inside executeNetWorkload...isPromised=" + isPromised)
     let splittedAddresses = addresses.split(",");
     let requests = [];
     for (let address of splittedAddresses) {
         try {
-            if (!isPromised) {
+            if (isPromised !== "1") {
                 requests.push(sendRequest(address, payloadSize));
             } else {
                 requests.push(promisedSendRequest(address, payloadSize));

@@ -16,6 +16,7 @@ module.exports = {
         } else {
             payloadSize = optionalPayloadSize;
         }
+        console.log("SENDING 2..." + addresses);
 
         if (addresses === "") return Promise.reject("Nothing executed!");
 

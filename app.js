@@ -54,6 +54,7 @@ app.get('*/x/:sendToNext?/:isPromised?', (req, res) => {
 
     if (sendToNext == true) {
         Promise.all(promises).then((responses) => {
+            console.log("SENDING...");
             let networkIntensiveWorkloadResults = workloads.networkIntensiveWorkload(req);
             if (networkIntensiveWorkloadResults[0] == true) {
                 Promise.all(networkIntensiveWorkloadResults[1]).then((value) => {
