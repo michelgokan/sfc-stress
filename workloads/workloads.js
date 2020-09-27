@@ -16,7 +16,6 @@ module.exports = {
         } else {
             payloadSize = optionalPayloadSize;
         }
-        console.log("SENDING 2..." + addresses);
 
         if (addresses === "") return Promise.reject("Nothing executed!");
 
@@ -60,15 +59,10 @@ module.exports = {
         return helper.getReturnPromises(promises, req, sendToNext, payloadSize, this.networkIntensiveWorkload);
     },
     runAll: function (req) {
-        console.log("Inside runall...BEGIN");
-        let sendToNext = helper.getParameter(req, 'sendToNext', false) > 0;
-        console.log("Inside runall...AFTER sendToNext");
-        let cpu = this.CPUIntensiveWorkload(req, false);
-        console.log("Inside runall...AFTER cpu");
-        let mem = this.memoryIntensiveWorkload(req, false);
-        console.log("Inside runall...AFTER mem");
-        let blkio = this.blkioIntensiveWorkload(req, false);
-        console.log("End of runall...");
+        let sendToNext = helper.getParameter(req, 'sendToNext', false) > 0,
+            cpu = this.CPUIntensiveWorkload(req, false),
+            mem = this.memoryIntensiveWorkload(req, false),
+            blkio = this.blkioIntensiveWorkload(req, false);
 
         return [sendToNext, [cpu, mem, blkio]];
     }

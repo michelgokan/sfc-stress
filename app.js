@@ -48,20 +48,12 @@ app.all('*/net/:payloadSize?/:isPromised?', (req, res) => {
         res.send("OK");
     }
 });
-app.all('*/x/:sendToNext?/:isPromised?', (req, res) => {
-    console.log("Inside X1 Before runall...");
-
-    let results = workloads.runAll(req);
-
-    console.log("Inside X1 After runall...");
-
-    let sendToNext = results[0], promises = results[1];
-
-    console.log("Inside X1 After assignment...");
+app.get('*/x/:sendToNext?/:isPromised?', (req, res) => {
+    let results = workloads.runAll(req),
+        sendToNext = results[0], promises = results[1];
 
     if (sendToNext == true) {
         Promise.all(promises).then((responses) => {
-            console.log("Inside X2...");
             let networkIntensiveWorkloadResults = workloads.networkIntensiveWorkload(req);
             if (networkIntensiveWorkloadResults[0] == true) {
                 Promise.all(networkIntensiveWorkloadResults[1]).then((value) => {
@@ -73,7 +65,6 @@ app.all('*/x/:sendToNext?/:isPromised?', (req, res) => {
                 res.send(name + ": OK");
             }
         }).catch(err => {
-            console.log("ERROR: " + err.toString());
             res.send(err.toString());
         });
     } else {
