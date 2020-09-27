@@ -64,6 +64,7 @@ module.exports = {
             cpu = this.CPUIntensiveWorkload(req, false),
             mem = this.memoryIntensiveWorkload(req, false),
             blkio = this.blkioIntensiveWorkload(req, false);
+        console.log("End of runall...");
 
         return [sendToNext, [cpu, mem, blkio]];
     }

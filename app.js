@@ -51,10 +51,11 @@ app.all('*/net/:payloadSize?/:isPromised?', (req, res) => {
 app.get('*/x/:sendToNext?/:isPromised?', (req, res) => {
     let results = workloads.runAll(req),
         sendToNext = results[0], promises = results[1];
+    console.log("Inside X1...");
 
     if (sendToNext == true) {
         Promise.all(promises).then((responses) => {
-            console.log("SENDING...");
+            console.log("Inside X2...");
             let networkIntensiveWorkloadResults = workloads.networkIntensiveWorkload(req);
             if (networkIntensiveWorkloadResults[0] == true) {
                 Promise.all(networkIntensiveWorkloadResults[1]).then((value) => {
@@ -66,6 +67,7 @@ app.get('*/x/:sendToNext?/:isPromised?', (req, res) => {
                 res.send(name + ": OK");
             }
         }).catch(err => {
+            console.log("ERROR: " + err.toString());
             res.send(err.toString());
         });
     } else {
