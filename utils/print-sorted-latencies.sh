@@ -3,15 +3,24 @@
 ROOTPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd ../ && pwd -P )"
 
 end=1900
-current=0
 step=100
-latencies=""
+current=300
+repetitionCount=5
 
+latencies="[
+   "
 while : ; do
-   latencies="$(echo "$latencies")
-$current,$(cat $ROOTPATH/logs/latency-cpu-$current.log)"
-
+   latencies="$latencies[["
+   for ((i=1;i<=$repetitionCount;i++))
+     do
+       latencies="$latencies$(cat $ROOTPATH/logs/latency-cpu-$i-$current.log),"
+   done
+   latencies="${latencies::-1}]],
+   "
    current=$((current+step))
    (( current <= end )) || break
 done
+latencies="${latencies::-5}
+]"
+
 echo "$latencies" | tail -n +1

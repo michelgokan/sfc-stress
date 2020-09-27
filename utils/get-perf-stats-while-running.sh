@@ -26,10 +26,12 @@ mainContainerID=$(echo "$podsContainers" | sed '1q;d' | awk "{print \$1}")
 pauseContainerID=$(echo "$podsContainers" | sed '2q;d' | awk "{print \$1}")
 mainContainerPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "docker inspect -f '{{.State.Pid}}' $mainContainerID" | sed 's/[^0-9]*//g')
 pauseContainerPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "docker inspect -f '{{.State.Pid}}' $pauseContainerID" | sed 's/[^0-9]*//g')
+logFileOfMainContainer=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "echo \"/var/lib/docker/containers/\$(docker inspect $mainContainerID | jq .[0].Id -r)/\$(docker inspect $mainContainerID | jq .[0].Id -r)-json.log\"" | sed 's/[^a-zA-Z0-9\/\.\-]*//g')
 
 echo "$podName is placed on $podNodeName with address $podNodeIP..."
 echo "It has 2 containers with image ID $mainContainerID and $pauseContainerID..."
 echo "The PID of the first pod is $mainContainerPID and the second one is $pauseContainerPID..."
+echo "Main container's log file path = " "$logFileOfMainContainer"
 # Network Part 
 path=$3
 fullPath="$baseURL$path"
@@ -39,19 +41,27 @@ perfLogPath="/tmp/trace-$epochTime-$podName.log"
 echo "Transfering thread-place-on-runqueues.sh to $podNodeName:/tmp ..."
 sshpass -p ${podNodePass} scp $ROOTPATH/utils/thread-place-on-runqueues.sh root@${podNodeIP}:/tmp
 
+pgrepPiece="\$(pgrep --ns $mainContainerPID | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID | paste -s -d \",\")"
+threadPlacementCmd="/tmp/thread-place-on-runqueues.sh $pgrepPiece"
+perfStatCmd="perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p $pgrepPiece -o $perfLogPath"
+perfRecordCmd=""
 
-echo "Running /tmp/thread-place-on-runqueues.sh \$(pgrep --ns $mainContainerPID -w | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID -w | paste -s -d \",\")"
+echo "Running $threadPlacementCmd"
 
-sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "screen -S $epochTime-threadMonitor-$podName  -d -m /tmp/thread-place-on-runqueues.sh \$(pgrep --ns $mainContainerPID -w | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID -w | paste -s -d \",\")"
-echo "Press any key..."
+sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "screen -S $epochTime-threadMonitor-$podName  -d -m $threadPlacementCmd"
 
-echo "Running perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -p \$(pgrep --ns $mainContainerPID -w | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID -w | paste -s -d \",\") -o $perfLogPath"
-perfPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "screen -S $epochTime-$podName  -d -m perf stat --per-thread -e instructions,cycles,task-clock,cpu-clock,cpu-migrations,context-switches,cache-misses,duration_time -t \$(pgrep --ns $mainContainerPID -w | paste -s -d \",\"),\$(pgrep --ns $pauseContainerPID -w | paste -s -d \",\") -o $perfLogPath
+echo "Running $perfStatCmd"
+perfPID=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET root@${podNodeIP} "
+screen -S $epochTime-$podName  -d -m $perfStatCmd
 perl -e \"select(undef,undef,undef,0.01);\"
 screenPID=\$(screen -ls | awk '/\\.$epochTime-$podName\\t/ {printf(\"%d\", strtonum(\$1))}')
 pgrep -P \$screenPID perf" | sed 's/[^0-9]*//g' | tr -d '\n')
-curl $fullPath
 echo ""
+echo "perfPID=$perfPID"
+echo ""
+
+curl $fullPath
+
 perfLog=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "(
  screen -XS $epochTime-threadMonitor-$podName quit
  perl -e \"select(undef,undef,undef,0.01);\"
