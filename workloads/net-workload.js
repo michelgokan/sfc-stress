@@ -7,11 +7,26 @@ const url = require("url");
 const FormData = require('form-data');
 const fs = require('fs');
 const now = require('nano-time');
+const request = require('request')
+
+// function getRequestOptions(address, payloadSize) {
+//     let url_object = new url.URL(address);
+//     let options = urlToOptions(url_object);
+//     options.method = "POST";
+//     return options;
+// }
 
 function getRequestOptions(address, payloadSize) {
-    let url_object = new url.URL(address);
-    let options = urlToOptions(url_object);
-    options.method = "POST";
+    let options = {
+        url: address,
+        method: "POST"
+    }
+    if (payloadSize) {
+        const readStream = fs.createReadStream('./workloads/payload/100MB.zip', {start: 0, end: payloadSize * 1000});
+        options['formData'] = {
+            'regularFile': readStream
+        }
+    }
     return options;
 }
 
@@ -24,11 +39,30 @@ function getForm(payloadSize) {
     return form;
 }
 
+// function sendRequest(address, payloadSize) {
+//     let options = getRequestOptions(address, payloadSize);
+//     const form = getForm(payloadSize);
+//     options.headers = form.getHeaders();
+//     const req = http.request(options);
+//
+//     req.on('error', (error) => {
+//         if (error.code !== "EPIPE") {
+//             console.error(error);
+//             throw error;
+//         } else {
+//             // console.error("EPIPE Error! Looks harmless :-)");
+//         }
+//     });
+//     req.on('finish', () => {
+//         console.log(`SENT - ${name} sent a ${req.method} request to ${address} at {${now()}}`);
+//     });
+//     form.pipe(req);
+//     return req;
+// }
+
 function sendRequest(address, payloadSize) {
     let options = getRequestOptions(address, payloadSize);
-    const form = getForm(payloadSize);
-    options.headers = form.getHeaders();
-    const req = http.request(options);
+    const req = request(options);
 
     req.on('error', (error) => {
         if (error.code !== "EPIPE") {
@@ -41,7 +75,7 @@ function sendRequest(address, payloadSize) {
     req.on('finish', () => {
         console.log(`SENT - ${name} sent a ${req.method} request to ${address} at {${now()}}`);
     });
-    form.pipe(req);
+
     return req;
 }
 
