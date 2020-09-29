@@ -38,7 +38,7 @@ module.exports = {
         if (sendToNext) {
             return allPromises.then((response) => {
                 try {
-                    sendToNextFunc(req, false, payloadSize < 1, payloadSize);
+                    sendToNextFunc(req, payloadSize < 1, payloadSize);
                 } catch (e) {
                     return Promise.reject(e);
                 }
