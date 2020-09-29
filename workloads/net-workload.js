@@ -6,6 +6,7 @@ const urlToOptions = require("url-to-options");
 const url = require("url");
 const FormData = require('form-data');
 const fs = require('fs');
+const now = require('nano-time');
 
 function getRequestOptions(address, payloadSize) {
     let url_object = new url.URL(address);
@@ -38,7 +39,7 @@ function sendRequest(address, payloadSize) {
         }
     });
     req.on('finish', () => {
-        console.log("SENT - " + name + " sent a " + req.method + " request to " + address);
+        console.log(`SENT - ${name} sent a ${req.method} request to ${address} at {${now()}}`);
     });
     form.pipe(req);
     return req;
