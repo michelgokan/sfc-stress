@@ -1,7 +1,7 @@
 {
-  "name": "synthetic_workload_generator",
-  "version": "1.0.0",
-  "author": "Michel Gokan <gokan.michel@gmail.com>",
+  "name": "synthetic_service_mesh",
+  "version": "2.0.0",
+  "author": "Michel Gokan Khan <gokan.michel@gmail.com>",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
