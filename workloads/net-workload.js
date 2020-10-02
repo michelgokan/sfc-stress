@@ -28,7 +28,11 @@ function sendRequest(address, payloadSize) {
     let options = getRequestOptions(address, payloadSize);
     const form = getForm(payloadSize);
     options.headers = form.getHeaders();
-    const req = http.request(options);
+    const req = http.request(options).setTimeout(9999999999999999999999999999999999);
+
+    // req.on('connect', (res, socket, head) => {
+    //     console.log(`CONNECT - ${name} connected to ${address} at {${now()}}`);
+    // });
 
     req.on('error', (error) => {
         if (error.code !== "EPIPE") {
@@ -41,6 +45,11 @@ function sendRequest(address, payloadSize) {
     req.on('finish', () => {
         console.log(`SENT - ${name} sent a ${req.method} request to ${address} at {${now()}}`);
     });
+
+    // req.on('end', () => {
+    //     console.log(`END - ${name} sent a ${req.method} request to ${address} at {${now()}}`);
+    // });
+
     form.pipe(req);
     return req;
 }
@@ -55,7 +64,7 @@ function promisedSendRequest(address, payloadSize) {
                 let body = [];
                 res.on('data', (chunk) => {
                     body.push(chunk);
-                });
+                }).setTimeout(9999999999999999999999999999999999);
                 res.on('end', function () {
                     let result = Buffer.concat(body).toString();
                     console.log("Received " + res.method + " response from " + address + " [REQUEST END]");

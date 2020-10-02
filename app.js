@@ -1,6 +1,9 @@
 const name = process.env.NAME;
 const express = require('express');
+var http = require('http');
 const app = express();
+var server = http.createServer(app);
+server.setTimeout(60000000);
 const bodyParser = require('body-parser');
 let workloads = require("./workloads/workloads");
 const helper = require("./workloads/helper");
@@ -80,4 +83,4 @@ app.get('*/', (req, res) => {
     res.send(converter.makeHtml(text));
 });
 
-app.listen(30005, "0.0.0.0");
+server.listen(30005);
