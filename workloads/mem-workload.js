@@ -1,13 +1,14 @@
 const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
+let loadash = require('lodash');
 
 async function executeMemWorkload(dataSize) {
     const onemb = require('./payload/onemb');
 
     let bigStrArray = [];
     for (let i = 0; i < dataSize; i++) {
-        bigStrArray.push(onemb);
+        bigStrArray.push(loadash.cloneDeep(onemb));
     }
-    console.log(bigStrArray)
+
     return await new Promise(resolve => setTimeout(resolve, 2000));
 }
 
