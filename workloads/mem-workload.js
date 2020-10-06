@@ -8,6 +8,8 @@ function executeMemWorkload(dataSize) {
         bigStrArray.push(onemb);
     }
 
+    setTimeout(function () {
+    }, 2000);
     return true;
 }
 
