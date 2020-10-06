@@ -14,8 +14,9 @@ module.exports = {
         let promises = [];
         if (threadsCount == 1) {
             promises.push(new Promise((resolve, reject) => {
-                func(paramValue);
-                resolve({paramValue: paramValue, threadsCount: threadsCount});
+                Promise.resolve(func(paramValue)).then(function (value) {
+                    resolve({paramValue: paramValue, threadsCount: threadsCount});
+                });
             }));
         } else {
             for (let i = 0; i < threadsCount; i++) {

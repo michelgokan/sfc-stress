@@ -1,6 +1,6 @@
 const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
 
-function executeMemWorkload(dataSize) {
+async function executeMemWorkload(dataSize) {
     const onemb = require('./payload/onemb');
 
     let bigStrArray = [];
@@ -8,9 +8,7 @@ function executeMemWorkload(dataSize) {
         bigStrArray.push(onemb);
     }
 
-    setTimeout(function () {
-    }, 2000);
-    return true;
+    return await new Promise(resolve => setTimeout(resolve, 2000));
 }
 
 if (!isMainThread) {
