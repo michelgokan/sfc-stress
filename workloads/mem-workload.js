@@ -7,7 +7,7 @@ async function executeMemWorkload(dataSize) {
     for (let i = 0; i < dataSize; i++) {
         bigStrArray.push(onemb);
     }
-
+    console.log(bigStrArray)
     return await new Promise(resolve => setTimeout(resolve, 2000));
 }
 
