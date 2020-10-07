@@ -7,7 +7,7 @@ async function executeMemWorkload(dataSize) {
 
     // let bigStrArray = [];
     // for (let i = 0; i < dataSize; i++) {
-    return execSync('stress-ng --vm-bytes 4294967296 --vm 1 --vm-ops 100000', {stdio: 'pipe'});
+    return execSync('stress-ng --vm-bytes 4294967296 --vm 1 --vm-ops ' + dataSize, {stdio: 'pipe'});
     // return cmd.get('stress-ng --vm-bytes 4294967296 --vm 1 --vm-ops 100000');
     // bigStrArray.push(loadash.cloneDeep(onemb));
     // }
