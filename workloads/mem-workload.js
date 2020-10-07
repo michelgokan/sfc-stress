@@ -6,7 +6,7 @@ async function executeMemWorkload(dataSize) {
 
     let bigStrArray = [];
     for (let i = 0; i < dataSize; i++) {
-        bigStrArray.push(crypto.randomBytes(100000000).toString('hex'));
+        bigStrArray.push(crypto.randomBytes(i * 1024).toString('hex'));
     }
 
     return true; //await new Promise(resolve => setTimeout(resolve, 2000));
