@@ -13,20 +13,15 @@ repetitionCount=$(($4))
 mkdir $ROOTPATH/logs
 
 
+$ROOTPATH/utils/kubernetes/assign-guaranteed-cpu-limit.sh $1 $2 "1"
 
 for ((i=1;i<=$repetitionCount;i++))
   do
    echo "Starting iteration $i"
-   startCpu=100
-   endCpu=1900
-   stepCpu=100
-   currentCpu=0
-   sleep 5
-   if [ "$currentCpu" -eq "0" ]; then
-      $ROOTPATH/utils/kubernetes/delete-resource-specs.sh $1 $2
-   else
-      $ROOTPATH/utils/kubernetes/assign-guaranteed-cpu-limit.sh $1 $2 "${currentCpu}m"
-   fi
+   startThread=1
+   endThread=200
+   stepThread=10
+   currentThread=1
    while : ; do
       v=$($ROOTPATH/utils/kubernetes/are-pods-in-namespace-ready.sh $2)
       
@@ -42,15 +37,18 @@ for ((i=1;i<=$repetitionCount;i++))
             break
          fi
       done
-      sleep 15
+      echo "Wait 10 seconds..."
+      sleep 10
       echo "#######################"
       echo ""
-      echo "Running $ROOTPATH/utils/get-perf-stats-while-running.sh $1 $2 $3 cpu-${i}-${currentCpu}"
-      $ROOTPATH/utils/get-perf-stats-while-running.sh $1 $2 $3 cpu-${i}-${currentCpu} > $ROOTPATH/logs/getPerfStatsWhileRunningOutput-cpu-${i}-${currentCpu}.log
-      currentCpu=$((currentCpu+stepCpu))
-      $ROOTPATH/utils/kubernetes/assign-guaranteed-cpu-limit.sh $1 $2 "${currentCpu}m"
+      podInfo=$(kubectl describe pod -n "$2" -l=name=$1)
+      podName=$(echo "$podInfo" | grep "^Name:" | awk "{print \$2}")
+      echo "Running $ROOTPATH/utils/get-perf-stats-while-running.sh $1 $2 $3/$currentThread thread-${i}-${currentThread} on pod $podName"
+      $ROOTPATH/utils/get-perf-stats-while-running.sh $1 $2 $3/$currentThread thread-${i}-${currentThread} > $ROOTPATH/logs/getPerfStatsWhileRunningOutput-thread-${i}-${currentThread}.log
+      currentThread=$((currentThread+stepThread))
+      kubectl delete pod --namespace $2 $podName
       echo "#######################"
       echo "#######################"
-      (( currentCpu <= endCpu )) || break
+      (( currentThread <= endThread )) || break
    done
 done
