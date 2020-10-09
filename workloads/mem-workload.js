@@ -8,7 +8,7 @@ function getRandomInt(max) {
 async function executeMemWorkload(dataSize) {
     let bigStrArray = [];
     for (let i = 0; i < dataSize; i++) {
-        bigStrArray.push(crypto.randomBytes(1024 * 1024).toString('hex'));
+        bigStrArray.push(crypto.randomBytes(1024 * 1024 / 2).toString('hex'));
     }
 
     return true; //await new Promise(resolve => setTimeout(resolve, 2000));
