@@ -28,6 +28,8 @@ spec:
               value: "http://172.16.16.111:30553/s2/mem/1/1/1"
             - name: NAME
               value: "s1"
+            - name: WORKERS_COUNT
+                value: 8
           ports:
             - containerPort: 30005
       nodeSelector:
