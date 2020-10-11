@@ -1,86 +1,79 @@
-const name = process.env.NAME;
+const cluster = require('cluster');
 const express = require('express');
-var http = require('http');
+const http = require('http');
 const app = express();
-var server = http.createServer(app);
-server.setTimeout(60000000);
 const bodyParser = require('body-parser');
-let workloads = require("./workloads/workloads");
+const router = require('./router')
 const helper = require("./workloads/helper");
 const now = require('nano-time');
 
-app.use(bodyParser.json({limit: '10000mb'}));
-app.use('/images', express.static('images'));
-app.use((req, res, next) => {
-    const start = process.hrtime();
-    console.log(`Received ${req.method} ${req.originalUrl} from ${req.headers['referer']} at {${now()}} [RECEIVED]`)
+let workers = [];
 
-    res.on('close', () => {
-        const durationInMilliseconds = helper.getDurationInMilliseconds(start);
-        console.log(`Closed received ${req.method} ${req.originalUrl} from ${req.headers['referer']} {${now()}} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
+// credits: https://github.com/DanishSiddiq/Clustering
+const setupWorkerProcesses = () => {
+    let numCores = require('os').cpus().length;
+    console.log('Master cluster setting up ' + numCores + ' workers');
+
+    for (let i = 0; i < numCores; i++) {
+        workers.push(cluster.fork());
+
+        workers[i].on('message', function (message) {
+            // console.log(message);
+        });
+    }
+
+    cluster.on('online', function (worker) {
+        console.log('Worker ' + worker.process.pid + ' is listening');
     });
-    next();
-})
-app.all('*/cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
-    workloads.CPUIntensiveWorkload(req).then(function (responses) {
-        res.send(name + ": Executed " + responses[0].paramValue + " Diffie-Hellman checksums in " + responses[0].threadsCount + " thread(s)!");
-    }).catch(err => {
-        res.send(err.toString());
-    }));
-app.all('*/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
-    workloads.memoryIntensiveWorkload(req).then(function (responses) {
-        res.send(name + ": Stored and released " + responses[0].paramValue + " x " + responses[0].threadsCount + "=" + responses[0].paramValue * responses[0].threadsCount + "MB of data in RAM using " + responses[0].threadsCount + " thread(s)!");
-    }).catch(err => {
-        res.send(err.toString());
-    }));
-app.all('*/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?', (req, res) =>
-    workloads.blkioIntensiveWorkload(req).then(function (responses) {
-        res.send(name + ": Wrote and removed " + responses[0].paramValue + "MB x " + responses[0].threadsCount + " files = " + responses[0].paramValue * responses[0].threadsCount + "MB of data in the storage using " + responses[0].threadsCount + " thread(s)!");
-    }).catch(err => {
-        res.send(err.toString());
-    }));
-app.all('*/net/:payloadSize?/:isPromised?', (req, res) => {
-    let networkIntensiveWorkloadResults = workloads.networkIntensiveWorkload(req);
-    if (networkIntensiveWorkloadResults[0] == true) {
-        Promise.all(networkIntensiveWorkloadResults[1]).then(function (responses) {
-            res.send(responses);
-        }).catch(err => {
-            res.send(err.toString());
+
+    // if any of the worker process dies then start a new one by simply forking another one
+    cluster.on('exit', function (worker, code, signal) {
+        console.log('Worker ' + worker.process.pid + ' died with code: ' + code + ', and signal: ' + signal);
+        console.log('Starting a new worker');
+        workers.push(cluster.fork());
+
+        workers[workers.length - 1].on('message', function (message) {
+            console.log(message);
         });
-    } else {
-        res.send("OK");
-    }
-});
-app.all('*/x/:sendToNext?/:isPromised?', (req, res) => {
-    let results = workloads.runAll(req),
-        sendToNext = results[0], promises = results[1];
+    });
+};
 
-    if (sendToNext == true) {
-        Promise.all(promises).then((responses) => {
-            let networkIntensiveWorkloadResults = workloads.networkIntensiveWorkload(req);
-            if (networkIntensiveWorkloadResults[0] == true) {
-                Promise.all(networkIntensiveWorkloadResults[1]).then((value) => {
-                    res.send(value);
-                }).catch(err => {
-                    res.send(err.toString());
-                });
-            } else {
-                res.send(name + ": OK");
-            }
-        }).catch(err => {
-            res.send(err.toString());
+// credits: https://github.com/DanishSiddiq/Clustering
+const setUpExpress = () => {
+    app.server = http.createServer(app);
+    app.server.setTimeout(60000000);
+
+    app.use(bodyParser.json({limit: '10000mb'}));
+    app.use('/images', express.static('images'));
+    app.use((req, res, next) => {
+        const start = process.hrtime();
+        console.log(`Received ${req.method} ${req.originalUrl} by process ID ${process.pid} from ${req.headers['referer']} at {${now()}} [RECEIVED]`)
+
+        res.on('close', () => {
+            const durationInMilliseconds = helper.getDurationInMilliseconds(start);
+            console.log(`Closed received ${req.method} ${req.originalUrl} from ${req.headers['referer']} {${now()}} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
         });
+        next();
+    })
+
+    router.setRouter(app);
+
+    app.server.listen(30005, () => {
+        console.log(`Started server on => http://localhost:${app.server.address().port} for Process Id ${process.pid}`);
+    });
+}
+
+// credits: https://github.com/DanishSiddiq/Clustering
+const setupServer = (isClusterRequired) => {
+    // if it is a master process then call setting up worker process
+    if (isClusterRequired && cluster.isMaster) {
+        setupWorkerProcesses();
     } else {
-        res.send(name + ": OK");
+        // to setup server configurations and share port address for incoming requests
+        setUpExpress();
     }
-});
+};
 
-app.get('*/', (req, res) => {
-    const showdown = require('showdown');
-    const fs = require('fs');
-    const converter = new showdown.Converter();
-    const text = fs.readFileSync('./README.md', 'utf8');
-    res.send(converter.makeHtml(text));
-});
+setupServer(true);
 
-server.listen(30005);
+
