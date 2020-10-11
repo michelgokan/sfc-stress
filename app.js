@@ -6,15 +6,16 @@ const bodyParser = require('body-parser');
 const router = require('./router')
 const helper = require("./workloads/helper");
 const now = require('nano-time');
+let workersCount = process.env.WORKERS_COUNT;
+
 
 let workers = [];
 
 // credits: https://github.com/DanishSiddiq/Clustering
 const setupWorkerProcesses = () => {
-    let numCores = require('os').cpus().length;
-    console.log('Master cluster setting up ' + numCores + ' workers');
+    console.log('Master cluster setting up ' + workersCount + ' workers');
 
-    for (let i = 0; i < numCores; i++) {
+    for (let i = 0; i < workersCount; i++) {
         workers.push(cluster.fork());
 
         workers[i].on('message', function (message) {
