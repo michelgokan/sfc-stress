@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: synthetic-service-mesh
+  name: synthetic-service-chain
   namespace: ingress-nginx
   labels:
-    app: synthetic-service-mesh
+    app: synthetic-service-chain
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: synthetic-service-mesh
+      app: synthetic-service-chain
   template:
     metadata:
       labels:
-        app: synthetic-service-mesh
+        app: synthetic-service-chain
         namespace: ingress-nginx
     spec:
       containers:
-        - name: synthetic-service-mesh
-          image: michelgokan/synthetic-service-mesh
+        - name: synthetic-service-chain
+          image: michelgokan/synthetic-service-chain
           env:
             - name: NEXT_SERVICES_ADDRESSES #comma separated
               value: ""
@@ -30,10 +30,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: synthetic-service-mesh
+  name: synthetic-service-chain
   namespace: ingress-nginx
   labels:
-    app: synthetic-service-mesh
+    app: synthetic-service-chain
 spec:
   ports:
   - port: 30005
@@ -41,13 +41,13 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: synthetic-service-mesh
+    app: synthetic-service-chain
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: synthetic-service-mesh
+  name: synthetic-service-chain
   namespace: ingress-nginx
   annotations:
      nginx.ingress.kubernetes.io/ssl-redirect: "false"
@@ -62,5 +62,5 @@ spec:
         paths:
           - path: /workload
             backend:
-              serviceName: synthetic-service-mesh
+              serviceName: synthetic-service-chain
               servicePort: 30005

@@ -4,7 +4,7 @@ metadata:
   name: s1
   namespace: ingress-nginx
   labels:
-    app: synthetic-service-mesh
+    app: synthetic-service-chain
     name: s1
 spec:
   replicas: 1
@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       labels:
-        app: synthetic-service-mesh
+        app: synthetic-service-chain
         name: s1
         namespace: ingress-nginx
       annotations:
@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: s1
-          image: michelgokan/synthetic-service-mesh
+          image: michelgokan/synthetic-service-chain
           env:
             - name: NEXT_SERVICES_ADDRESSES
               value: "http://172.16.16.111:30553/s2/mem/1/1/1"
@@ -41,7 +41,7 @@ metadata:
   name: s1
   namespace: ingress-nginx
   labels:
-    app: synthetic-service-mesh
+    app: synthetic-service-chain
     name: s1
 spec:
   ports:
