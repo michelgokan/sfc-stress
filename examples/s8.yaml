@@ -5,7 +5,7 @@ metadata:
   namespace: ingress-nginx
   labels:
     name: s8
-    app: synthetic-service-mesh
+    app: synthetic-service-chain
 spec:
   replicas: 1
   selector:
@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       labels:
-        app: synthetic-service-mesh
+        app: synthetic-service-chain
         name: s8
         namespace: ingress-nginx
       annotations:
@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: s8
-          image: michelgokan/synthetic-service-mesh
+          image: michelgokan/synthetic-service-chain
           env:
             - name: NEXT_SERVICES_ADDRESSES
               value: ""
@@ -38,7 +38,7 @@ metadata:
   namespace: ingress-nginx
   labels:
     name: s8
-    app: synthetic-service-mesh
+    app: synthetic-service-chain
 spec:
   ports:
   - port: 30012
