@@ -55,9 +55,9 @@ metadata:
   name: s3
   namespace: ingress-nginx
   annotations:
-     nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
-     nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
-     nginx.ingress.kubernetes.io/proxy-connect-timeout: "1800"
+     nginx.ingress.kubernetes.io/proxy-send-timeout: "18000"
+     nginx.ingress.kubernetes.io/proxy-read-timeout: "18000"
+     nginx.ingress.kubernetes.io/proxy-connect-timeout: "18000"
      nginx.ingress.kubernetes.io/ssl-redirect: "false"
      nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
      nginx.ingress.kubernetes.io/proxy-body-size: "10000m"
