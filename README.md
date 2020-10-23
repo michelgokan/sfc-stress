@@ -32,7 +32,7 @@ To enable promised-mode, pass 1 to isPromised parameter in */net or */x.
 Run all workloads mentioned above once!
 
 # Installation on Kubernetes
-Simply use `kubectl apply -f synthetic-service-chain.yaml` and access via `http://<your_nginx_address>/workload/`. Make sure to set NEXT_SERVICES_ADDRESSES environment variable in the yaml file for the network intensive workload and/or for properly forming your service chain graph.
+Simply use `kubectl apply -f sfc-stress.yaml` and access via `http://<your_nginx_address>/workload/`. Make sure to set NEXT_SERVICES_ADDRESSES environment variable in the yaml file for the network intensive workload and/or for properly forming your service chain graph.
 
 # Evaluations
 Make sure you installed following packages on ALL kubernetes nodes:

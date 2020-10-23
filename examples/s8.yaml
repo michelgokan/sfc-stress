@@ -5,7 +5,7 @@ metadata:
   namespace: ingress-nginx
   labels:
     name: s8
-    app: synthetic-service-chain
+    app: sfc-stress
 spec:
   replicas: 1
   selector:
@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       labels:
-        app: synthetic-service-chain
+        app: sfc-stress
         name: s8
         namespace: ingress-nginx
       annotations:
@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: s8
-          image: michelgokan/synthetic-service-chain
+          image: michelgokan/sfc-stress
           env:
             - name: NEXT_SERVICES_ADDRESSES
               value: ""
@@ -38,7 +38,7 @@ metadata:
   namespace: ingress-nginx
   labels:
     name: s8
-    app: synthetic-service-chain
+    app: sfc-stress
 spec:
   ports:
   - port: 30012

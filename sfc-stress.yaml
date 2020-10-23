@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: synthetic-service-chain
+  name: sfc-stress
   namespace: ingress-nginx
   labels:
-    app: synthetic-service-chain
+    app: sfc-stress
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: synthetic-service-chain
+      app: sfc-stress
   template:
     metadata:
       labels:
-        app: synthetic-service-chain
+        app: sfc-stress
         namespace: ingress-nginx
     spec:
       containers:
-        - name: synthetic-service-chain
-          image: michelgokan/synthetic-service-chain
+        - name: sfc-stress
+          image: michelgokan/sfc-stress
           env:
             - name: NEXT_SERVICES_ADDRESSES #comma separated
               value: ""
@@ -30,10 +30,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: synthetic-service-chain
+  name: sfc-stress
   namespace: ingress-nginx
   labels:
-    app: synthetic-service-chain
+    app: sfc-stress
 spec:
   ports:
   - port: 30005
@@ -41,13 +41,13 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: synthetic-service-chain
+    app: sfc-stress
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: synthetic-service-chain
+  name: sfc-stress
   namespace: ingress-nginx
   annotations:
      nginx.ingress.kubernetes.io/ssl-redirect: "false"
@@ -62,5 +62,5 @@ spec:
         paths:
           - path: /workload
             backend:
-              serviceName: synthetic-service-chain
+              serviceName: sfc-stress
               servicePort: 30005
