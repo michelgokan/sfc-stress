@@ -87,9 +87,8 @@ perfLog=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "
  screen -XS $epochTime-threadMonitor-$podName quit
  screen -XS $epochTime-pmap-$podName quit
  screen -S $epochTime-kill-pidstat-$podName -d -m bash -c \"$pidstatKillCmd\"
- perl -e \"select(undef,undef,undef,0.01);\"
  kill -INT $perfPID
- perl -e \"select(undef,undef,undef,0.01);\"
+ sleep 0.2
  cat $perfLogPath
  rm -Rf $perfLogPath
 )")
