@@ -6,9 +6,9 @@
 You can use yaml files inside the `examples` folder to deplot service chain above on the Kubernetes (or use them as an example for your own custom service chain). To start the traffic, you should send a GET request to /s1/cpu/1/1/1. It will then send a single request to s1 and then s1 send the traffic to s2, s2 to s3 and s7 and so on.
 
 # Endpoints:
-* */cpu/:workloadSize?/:threadsCount?/:sendToNext? for CPU intensive workloads
-* */mem/:dataSize?/:threadsCount?/:sendToNext? for memory intensive workloads
-* */blkio/:fileSize?/:threadsCount?/:sendToNext? for disk intensive workloads
+* */cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize? for CPU intensive workloads
+* */mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize? for memory intensive workloads
+* */blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize? for disk intensive workloads
 * */net/:payloadSize?/:isPromised? for network intensive workloads
 * */x/:sendToNext?/:isPromised? for combined workloads
 
