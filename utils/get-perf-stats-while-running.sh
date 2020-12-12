@@ -92,7 +92,7 @@ perfLog=$(sshpass -p ${podNodePass} ssh -o LogLevel=QUIET -t root@${podNodeIP} "
  cat $perfLogPath
  rm -Rf $perfLogPath
 )")
-echo "$perfLog"
+#echo "$perfLog"
 
 echo ""
 echo "Running $pidstatKillCmd"

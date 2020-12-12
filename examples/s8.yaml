@@ -28,6 +28,8 @@ spec:
               value: ""
             - name: NAME
               value: "s8"
+            - name: WORKERS_COUNT
+              value: "100"
           ports:
             - containerPort: 30005
 ---

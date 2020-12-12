@@ -28,6 +28,8 @@ spec:
               value: "http://172.16.16.111:30553/s4/blkio/1/1/0/0"
             - name: NAME
               value: "s5"
+            - name: WORKERS_COUNT
+              value: "100"
           ports:
             - containerPort: 30005
 ---

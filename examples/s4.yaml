@@ -28,6 +28,8 @@ spec:
               value: "http://172.16.16.111:30553/s5/x/1/1"
             - name: NAME
               value: "s4"
+            - name: WORKERS_COUNT
+              value: "100"
           ports:
             - containerPort: 30005
 ---

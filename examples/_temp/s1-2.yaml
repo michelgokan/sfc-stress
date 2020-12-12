@@ -4,7 +4,7 @@ metadata:
   name: s2
   namespace: ingress-nginx
   labels:
-    app: sfc-stress
+    app: synthetic-service-mesh
     name: s2
 spec:
   replicas: 1
@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       labels:
-        app: sfc-stress
+        app: synthetic-service-mesh
         name: s2
         namespace: ingress-nginx
       annotations:
@@ -22,16 +22,17 @@ spec:
     spec:
       containers:
         - name: s2
-          image: michelgokan/sfc-stress
+          image: michelgokan/synthetic-service-mesh
           env:
             - name: NEXT_SERVICES_ADDRESSES
-              value: "http://172.16.16.111:30553/s3/net/1/0,http://172.16.16.111:30553/s7/x/1/0"
+              value: ""
             - name: NAME
               value: "s2"
-            - name: WORKERS_COUNT
-              value: "100"
           ports:
             - containerPort: 30005
+      nodeSelector:
+        kubernetes.io/hostname: node3
+        
 ---
 apiVersion: v1
 kind: Service
@@ -39,11 +40,11 @@ metadata:
   name: s2
   namespace: ingress-nginx
   labels:
-    app: sfc-stress
+    app: synthetic-service-mesh
     name: s2
 spec:
   ports:
-  - port: 30006
+  - port: 30005
     targetPort: 30005
     protocol: TCP
     name: http
