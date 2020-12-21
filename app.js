@@ -6,7 +6,8 @@ const bodyParser = require('body-parser');
 const router = require('./router')
 const helper = require("./workloads/helper");
 const now = require('nano-time');
-let workersCount = process.env.WORKERS_COUNT;
+// let workersCount = process.env.WORKERS_COUNT;
+let workersCount = 8;
 
 
 let workers = [];

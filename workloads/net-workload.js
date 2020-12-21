@@ -87,7 +87,11 @@ function promisedSendRequest(address, payloadSize) {
 }
 
 function executeNetWorkload(payloadSize, req, isPromised = false) {
-    let splittedAddresses = addresses.split(",");
+    let splittedAddresses = [];
+
+    if(addresses != null || addresses.trim() === "")
+        splittedAddresses = addresses.split(",");
+
     let requests = [];
     for (let address of splittedAddresses) {
         try {
