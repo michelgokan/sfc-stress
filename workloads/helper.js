@@ -55,5 +55,8 @@ module.exports = {
         const diff = process.hrtime(start);
 
         return (diff[0] * NS_PER_SEC + diff[1]) / NS_TO_MS;
+    },
+    isAddressesAvailable: function(addresses) {
+        return addresses !== undefined && addresses != null && addresses.trim() !== "";
     }
 }

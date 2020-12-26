@@ -6,9 +6,9 @@ const bodyParser = require('body-parser');
 const router = require('./router')
 const helper = require("./workloads/helper");
 const now = require('nano-time');
-// let workersCount = process.env.WORKERS_COUNT;
-let workersCount = 8;
-
+let workersCount = process.env.WORKERS_COUNT;
+// let workersCount = 8;
+// process.env.NEXT_SERVICES_ADDRESSES="http://127.0.0.1:30005/cpu/100"
 
 let workers = [];
 

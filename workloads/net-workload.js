@@ -2,6 +2,7 @@ const {Worker, isMainThread, parentPort, workerData} = require('worker_threads')
 const addresses = process.env.NEXT_SERVICES_ADDRESSES;
 const name = process.env.NAME === undefined ? "undefined" : process.env.NAME;
 const http = require("http");
+const helper = require("./helper");
 const urlToOptions = require("url-to-options");
 const url = require("url");
 const FormData = require('form-data');
@@ -15,16 +16,22 @@ function getRequestOptions(address, payloadSize) {
     return options;
 }
 
+// payloadSize is in MB
 function getForm(payloadSize) {
     const form = new FormData();
     if (payloadSize) {
-        const readStream = fs.createReadStream('./workloads/payload/100MB.zip', {start: 0, end: payloadSize * 1000});
+        const readStream = fs.createReadStream('./workloads/payload/100MB.zip', {start: 0, end: payloadSize * 1000 * 1000});
+        console.log("Read from byte 0 to byte " + payloadSize);
         form.append('data', readStream);
+    } else {
+        console.log("No payload size specified");
     }
+
     return form;
 }
 
 function sendRequest(address, payloadSize) {
+    console.log("Calling sendRequest");
     let options = getRequestOptions(address, payloadSize);
     const form = getForm(payloadSize);
     options.headers = form.getHeaders();
@@ -64,7 +71,7 @@ function promisedSendRequest(address, payloadSize) {
                 let body = [];
                 res.on('data', (chunk) => {
                     body.push(chunk);
-                }).setTimeout(9999999999999999999999999999999999);
+                }).setTimeout(2147483647);
                 res.on('end', function () {
                     let result = Buffer.concat(body).toString();
                     console.log("Received " + res.method + " response from " + address + " [REQUEST END]");
@@ -89,15 +96,17 @@ function promisedSendRequest(address, payloadSize) {
 function executeNetWorkload(payloadSize, req, isPromised = false) {
     let splittedAddresses = [];
 
-    if(addresses != null || addresses.trim() === "")
+    if (helper.isAddressesAvailable(addresses))
         splittedAddresses = addresses.split(",");
 
     let requests = [];
     for (let address of splittedAddresses) {
         try {
             if (!isPromised) {
+                console.log("sendRequest("+address+","+payloadSize+")")
                 requests.push(sendRequest(address, payloadSize));
             } else {
+                console.log("promisedSendRequest("+address+","+payloadSize+")")
                 requests.push(promisedSendRequest(address, payloadSize));
             }
         } catch (e) {
@@ -109,7 +118,10 @@ function executeNetWorkload(payloadSize, req, isPromised = false) {
 }
 
 function executePromisedNetWorkload(payloadSize) {
-    let splittedAddresses = addresses.split(",");
+    let splittedAddresses = []
+    if (helper.isAddressesAvailable(addresses))
+        splittedAddresses = addresses.split(",");
+
     let promises = [];
     for (let address of splittedAddresses) {
         promises.push(promisedSendRequest(address, payloadSize));

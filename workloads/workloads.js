@@ -7,20 +7,22 @@ const helper = require('./helper');
 
 module.exports = {
     networkIntensiveWorkload: function (req = undefined, isEmptyRequest = false, optionalPayloadSize = undefined) {
-        let payloadSize, isPromised = helper.getParameter(req, 'isPromised', false);
+        let isPromised = helper.getParameter(req, 'isPromised', false);
 
-        if (isEmptyRequest) {
+        let payloadSize;
+        if (isEmptyRequest)
             payloadSize = 0;
-        } else if (optionalPayloadSize === undefined || optionalPayloadSize == -1) {
+        else if (optionalPayloadSize === undefined || optionalPayloadSize === -1)
             payloadSize = helper.getParameter(req, 'payloadSize', 1);
-        } else {
+        else
             payloadSize = optionalPayloadSize;
+
+        if (!helper.isAddressesAvailable(addresses))
+            return Promise.reject("Nothing executed!");
+        else {
+            let result = netWorkload.executeNetWorkload(payloadSize, req, isPromised);
+            return [isPromised, result];
         }
-
-        if (addresses === "") return Promise.reject("Nothing executed!");
-
-        let result = netWorkload.executeNetWorkload(payloadSize, req, isPromised);
-        return [isPromised, result];
     },
     CPUIntensiveWorkload: function (req = undefined, sendToNext = undefined) {
         let workloadSize = helper.getParameter(req, 'workloadSize'),
