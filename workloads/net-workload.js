@@ -20,8 +20,9 @@ function getRequestOptions(address, payloadSize) {
 function getForm(payloadSize) {
     const form = new FormData();
     if (payloadSize) {
-        const readStream = fs.createReadStream('./workloads/payload/100MB.zip', {start: 0, end: payloadSize * 1000 * 1000});
-        console.log("Read from byte 0 to byte " + payloadSize);
+        let end_byte = payloadSize * 1000 * 1000;
+        const readStream = fs.createReadStream('./workloads/payload/100MB.zip', {start: 0, end: end_byte});
+        console.log("Read from byte 0 to byte " + end_byte);
         form.append('data', readStream);
     } else {
         console.log("No payload size specified");
