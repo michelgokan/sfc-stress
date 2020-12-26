@@ -35,7 +35,7 @@ function sendRequest(address, payloadSize) {
     let options = getRequestOptions(address, payloadSize);
     const form = getForm(payloadSize);
     options.headers = form.getHeaders();
-    const req = http.request(options).setTimeout(9999999999999999999999999999999999);
+    const req = http.request(options).setTimeout(2147483647);
 
     // req.on('connect', (res, socket, head) => {
     //     console.log(`CONNECT - ${name} connected to ${address} at {${now()}}`);
