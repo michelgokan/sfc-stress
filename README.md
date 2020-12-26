@@ -10,7 +10,7 @@ You can use yaml files inside the `examples` folder to deplot service chain abov
 * */mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize? for memory intensive workloads
 * */blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize? for disk intensive workloads
 * */net/:payloadSize?/:isPromised? for network intensive workloads
-* */x/:sendToNext?/:isPromised? for combined workloads
+* */x/:workloadSize?/:dataSize?/:fileSize?/:payloadSize?/:sendToNext?/:isPromised? for combined workloads
 
 
 ## CPU Intensive Workload: 

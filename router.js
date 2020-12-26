@@ -34,7 +34,7 @@ const setRouter = (app) => {
             res.send("OK");
         }
     });
-    router.all('*/x/:sendToNext?/:isPromised?', (req, res) => {
+    router.all('*/x/:workloadSize?/:dataSize?/:fileSize?/:payloadSize?/:sendToNext?/:isPromised?', (req, res) => {
         let results = workloads.runAll(req),
             sendToNext = results[0], promises = results[1];
 
