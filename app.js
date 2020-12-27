@@ -8,11 +8,14 @@ const helper = require("./workloads/helper");
 const now = require('nano-time');
 let workersCount = process.env.WORKERS_COUNT;
 // let workersCount = 8;
-// process.env.NEXT_SERVICES_ADDRESSES="http://127.0.0.1:30005/cpu/100"
+// process.env.NEXT_SERVICES_ADDRESSES = "http://127.0.0.1:30005/cpu/100"
 
 let workers = [];
 
+
 // credits: https://github.com/DanishSiddiq/Clustering
+// modification: Michel Gokan Khan
+
 const setupWorkerProcesses = () => {
     console.log('Master cluster setting up ' + workersCount + ' workers');
 
@@ -62,14 +65,23 @@ const setUpExpress = () => {
 
     app.server.listen(30005, () => {
         console.log(`Started server on => http://localhost:${app.server.address().port} for Process Id ${process.pid}`);
+        process.send({ topic: "INCREMENT" });
     });
 }
 
 // credits: https://github.com/DanishSiddiq/Clustering
 const setupServer = (isClusterRequired) => {
+    let onlineWorkers = 0;
     // if it is a master process then call setting up worker process
     if (isClusterRequired && cluster.isMaster) {
         setupWorkerProcesses();
+        cluster.on('message', (worker, msg, handle) => {
+            if (msg.topic && msg.topic === "INCREMENT") {
+                if(++onlineWorkers === workersCount){
+                    console.log("Workers ready...");
+                }
+            }
+        });
     } else {
         // to setup server configurations and share port address for incoming requests
         setUpExpress();
