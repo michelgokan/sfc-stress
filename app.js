@@ -19,7 +19,7 @@ let workers = [];
 const setupWorkerProcesses = () => {
     console.log('Master cluster setting up ' + workersCount + ' workers');
 
-    for (let i = 0; i < workersCount; i++) {
+    for (let i = 0; i < parseInt(workersCount); i++) {
         workers.push(cluster.fork());
 
         workers[i].on('message', function (message) {
@@ -77,7 +77,7 @@ const setupServer = (isClusterRequired) => {
         setupWorkerProcesses();
         cluster.on('message', (worker, msg, handle) => {
             if (msg.topic && msg.topic === "INCREMENT") {
-                if(++onlineWorkers === workersCount){
+                if(++onlineWorkers === parseInt(workersCount)){
                     console.log("Workers ready...");
                 }
             }
