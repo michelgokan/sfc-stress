@@ -8,7 +8,7 @@ const helper = require("./workloads/helper");
 const now = require('nano-time');
 let workersCount = process.env.WORKERS_COUNT;
 // let workersCount = 8;
-// process.env.NEXT_SERVICES_ADDRESSES = "http://127.0.0.1:30005/cpu/100"
+// process.env.NEXT_SERVICES_ADDRESSES = "http://172.16.16.111:30553/s1"
 
 let workers = [];
 
@@ -51,6 +51,7 @@ const setUpExpress = () => {
     app.use(bodyParser.json({limit: '10000mb'}));
     app.use('/images', express.static('images'));
     app.use((req, res, next) => {
+        app.locals.start_time = now();
         const start = process.hrtime();
         console.log(`Received ${req.method} ${req.originalUrl} by process ID ${process.pid} from ${req.headers['referer']} at {${now()}} [RECEIVED]`)
 

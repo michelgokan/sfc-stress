@@ -62,7 +62,7 @@ function sendRequest(address, payloadSize) {
     return req;
 }
 
-function promisedSendRequest(address, payloadSize) {
+function promisedSendRequest(address, payloadSize, originalReq) {
     return new Promise(function (resolve, reject) {
         try {
             let options = getRequestOptions(address, payloadSize);
@@ -75,7 +75,8 @@ function promisedSendRequest(address, payloadSize) {
                 }).setTimeout(2147483647);
                 res.on('end', function () {
                     let result = Buffer.concat(body).toString();
-                    console.log("Received " + res.method + " response from " + address + " [REQUEST END]");
+                    const durationInMilliseconds = (now() - originalReq.app.locals.start_time) / 1e6;
+                    console.log(`Received ${res.method} response from ${address} at {${now()}} [REQUEST END] ${durationInMilliseconds.toLocaleString()}ms`);
                     resolve(result);
                 });
                 res.on('error', (e) => {
@@ -108,7 +109,7 @@ function executeNetWorkload(payloadSize, req, isPromised = false) {
                 requests.push(sendRequest(address, payloadSize));
             } else {
                 console.log("promisedSendRequest(" + address + "," + payloadSize + ")")
-                requests.push(promisedSendRequest(address, payloadSize));
+                requests.push(promisedSendRequest(address, payloadSize, req));
             }
         } catch (e) {
             return e;
