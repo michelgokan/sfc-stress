@@ -87,7 +87,7 @@ function promisedSendRequest(address, payloadSize) {
             req.on('error', (error) => {
                 reject(error);
             });
-            req.on('finish', () => console.log("SENT - " + name + " sent a " + req.method + " request to " + address));
+            req.on('finish', () => console.log(`SENT - ${name} sent a  ${req.method} request to ${address} at {${now()}}`));
         } catch (e) {
             reject(e);
         }
@@ -104,10 +104,10 @@ function executeNetWorkload(payloadSize, req, isPromised = false) {
     for (let address of splittedAddresses) {
         try {
             if (!isPromised) {
-                console.log("sendRequest("+address+","+payloadSize+")")
+                console.log("sendRequest(" + address + "," + payloadSize + ")")
                 requests.push(sendRequest(address, payloadSize));
             } else {
-                console.log("promisedSendRequest("+address+","+payloadSize+")")
+                console.log("promisedSendRequest(" + address + "," + payloadSize + ")")
                 requests.push(promisedSendRequest(address, payloadSize));
             }
         } catch (e) {
