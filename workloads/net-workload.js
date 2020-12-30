@@ -95,9 +95,9 @@ function promisedSendRequest(address, payloadSize, originalReq) {
                 reject(error);
             });
             req.on('finish', () => {
-                const durationInMilliseconds = (now() - originalReq.app.locals.start_time) / 1e6;
-                const durationInMilliseconds2 = (now() - originalReq.app.locals.connect_time) / 1e6;
-                console.log(`SENT - ${name} sent a  ${req.method} request to ${address} at {${now()}} (duration from the beginning is ${durationInMilliseconds}ms - sending duration is ${durationInMilliseconds2}ms)`);
+                const execDurationInMilliseconds = (now() - originalReq.app.locals.start_time) / 1e6;
+                const sendingDurationInMilliseconds = (now() - originalReq.app.locals.connect_time) / 1e6;
+                console.log(`SENT - ${name} sent a  ${req.method} request to ${address} at {${now()}} (duration from the beginning is ${execDurationInMilliseconds.toLocaleString()}ms - sending duration is ${sendingDurationInMilliseconds.toLocaleString()}ms)`);
             });
         } catch (e) {
             reject(e);
