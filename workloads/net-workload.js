@@ -97,7 +97,7 @@ function promisedSendRequest(address, payloadSize, originalReq) {
             req.on('finish', () => {
                 const durationInMilliseconds = (now() - originalReq.app.locals.start_time) / 1e6;
                 const durationInMilliseconds2 = (now() - originalReq.app.locals.connect_time) / 1e6;
-                console.log(`SENT - ${name} sent a  ${req.method} request to ${address} at {${now()}} (duration from the beginning is ${durationInMilliseconds}ms - sending duration is ${durationInMilliseconds2})`);
+                console.log(`SENT - ${name} sent a  ${req.method} request to ${address} at {${now()}} (duration from the beginning is ${durationInMilliseconds}ms - sending duration is ${durationInMilliseconds2}ms)`);
             });
         } catch (e) {
             reject(e);
