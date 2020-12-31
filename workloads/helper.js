@@ -38,12 +38,22 @@ module.exports = {
         let allPromises = Promise.all(promises);
         if (sendToNext) {
             return allPromises.then((response) => {
+                let result;
                 try {
-                    sendToNextFunc(req, payloadSize < 1, payloadSize);
+                    result = sendToNextFunc(req, payloadSize < 1, payloadSize);
                 } catch (e) {
                     return Promise.reject(e);
                 }
-                return response;
+                if (Array.isArray(result) && result.length == 2) {
+                    let promiseArray = [[response], result[1]];
+                    return Promise.all(
+                        promiseArray.map(function (innerPromiseArray) {
+                            return Promise.all(innerPromiseArray);
+                        })
+                    );
+                } else {
+                    return response;
+                }
             });
         } else {
             return allPromises;
@@ -56,7 +66,7 @@ module.exports = {
 
         return (diff[0] * NS_PER_SEC + diff[1]) / NS_TO_MS;
     },
-    isAddressesAvailable: function(addresses) {
+    isAddressesAvailable: function (addresses) {
         return addresses !== undefined && addresses != null && addresses.trim() !== "";
     }
 }

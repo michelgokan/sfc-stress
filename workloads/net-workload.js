@@ -77,7 +77,8 @@ function promisedSendRequest(address, payloadSize, originalReq) {
                     let result = Buffer.concat(body).toString();
                     const durationInMilliseconds = (now() - originalReq.app.locals.start_time) / 1e6;
                     console.log(`Received ${res.method} response from ${address} at {${now()}} [REQUEST END] ${durationInMilliseconds.toLocaleString()}ms`);
-                    resolve(result);
+                    if(res.method == null)
+                        resolve(result);
                 });
                 res.on('error', (e) => {
                     reject(e);
@@ -114,7 +115,7 @@ function executeNetWorkload(payloadSize, req, isPromised = false) {
     let requests = [];
     for (let address of splittedAddresses) {
         try {
-            if (!isPromised) {
+            if (!isPromised || isPromised === "0") {
                 console.log("sendRequest(" + address + "," + payloadSize + ")")
                 requests.push(sendRequest(address, payloadSize));
             } else {

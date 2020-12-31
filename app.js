@@ -8,7 +8,7 @@ const helper = require("./workloads/helper");
 const now = require('nano-time');
 let workersCount = process.env.WORKERS_COUNT;
 // let workersCount = 8;
-// process.env.NEXT_SERVICES_ADDRESSES = "http://172.16.16.111:30553/s1"
+// process.env.NEXT_SERVICES_ADDRESSES = "http://172.16.16.111:30553/s1,http://172.16.16.111:30553/s2"
 
 let workers = [];
 
