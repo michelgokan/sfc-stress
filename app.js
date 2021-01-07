@@ -59,6 +59,21 @@ const setUpExpress = () => {
             const durationInMilliseconds = helper.getDurationInMilliseconds(start);
             console.log(`Closed received ${req.method} ${req.originalUrl} from ${req.headers['referer']} {${now()}} [CLOSED] ${durationInMilliseconds.toLocaleString()} ms`)
         });
+
+        // Set the timeout for all HTTP requests
+        req.setTimeout(2147483647, () => {
+            let err = new Error('Request Timeout');
+            err.status = 408;
+            next(err);
+        });
+        
+        // Set the server response timeout for all HTTP requests
+        res.setTimeout(2147483647, () => {
+            let err = new Error('Service Unavailable (timeout)');
+            err.status = 503;
+            next(err);
+        });
+
         next();
     })
 
