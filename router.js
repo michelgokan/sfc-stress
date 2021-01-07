@@ -4,25 +4,37 @@ const router = express.Router();
 const workloads = require("./workloads/workloads");
 
 const setRouter = (app) => {
-    router.all('*/cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize?/:isPromised?', (req, res) =>
+    router.all('*/cpu/:workloadSize?/:threadsCount?/:sendToNext?/:payloadSize?/:isPromised?', (req, res) => {
+        req.setTimeout(2147483647);
+        res.setTimeout(2147483647);
+
         workloads.CPUIntensiveWorkload(req).then(function (responses) {
             res.send(name + ": Executed " + responses[0].paramValue + " Diffie-Hellman checksums in " + responses[0].threadsCount + " thread(s)!");
         }).catch(err => {
             res.send(err.toString());
-        }));
-    router.all('*/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?/:isPromised?', (req, res) =>
+        });
+    });
+    router.all('*/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?/:isPromised?', (req, res) => {
+        req.setTimeout(2147483647);
+        res.setTimeout(2147483647);
         workloads.memoryIntensiveWorkload(req).then(function (responses) {
             res.send(name + ": Stored and released " + responses[0].paramValue + " x " + responses[0].threadsCount + "=" + responses[0].paramValue * responses[0].threadsCount + "MB of data in RAM using " + responses[0].threadsCount + " thread(s)!");
         }).catch(err => {
             res.send(err.toString());
-        }));
-    router.all('*/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?/:isPromised?', (req, res) =>
+        });
+    });
+    router.all('*/blkio/:fileSize?/:threadsCount?/:sendToNext?/:payloadSize?/:isPromised?', (req, res) => {
+        req.setTimeout(2147483647);
+        res.setTimeout(2147483647);
         workloads.blkioIntensiveWorkload(req).then(function (responses) {
             res.send(name + ": Wrote and removed " + responses[0].paramValue + "MB x " + responses[0].threadsCount + " files = " + responses[0].paramValue * responses[0].threadsCount + "MB of data in the storage using " + responses[0].threadsCount + " thread(s)!");
         }).catch(err => {
             res.send(err.toString());
-        }));
+        });
+    });
     router.all('*/net/:payloadSize?/:isPromised?', (req, res) => {
+        req.setTimeout(2147483647);
+        res.setTimeout(2147483647);
         let networkIntensiveWorkloadResults = workloads.networkIntensiveWorkload(req);
         if (networkIntensiveWorkloadResults[0] == true) {
             Promise.all(networkIntensiveWorkloadResults[1]).then(function (responses) {
@@ -35,6 +47,9 @@ const setRouter = (app) => {
         }
     });
     router.all('*/x/:workloadSize?/:dataSize?/:fileSize?/:payloadSize?/:sendToNext?/:isPromised?', (req, res) => {
+        req.setTimeout(2147483647);
+        res.setTimeout(2147483647);
+
         let results = workloads.runAll(req),
             sendToNext = results[0], promises = results[1];
 
@@ -59,6 +74,9 @@ const setRouter = (app) => {
     });
 
     router.get('*/', (req, res) => {
+        req.setTimeout(2147483647);
+        res.setTimeout(2147483647);
+
         const showdown = require('showdown');
         const fs = require('fs');
         const converter = new showdown.Converter();
