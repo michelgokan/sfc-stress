@@ -46,7 +46,7 @@ const setupWorkerProcesses = () => {
 // credits: https://github.com/DanishSiddiq/Clustering
 const setUpExpress = () => {
     app.server = http.createServer(app);
-    app.server.setTimeout(60000000);
+    app.server.setTimeout(2147483647);
 
     app.use(bodyParser.json({limit: '10000mb'}));
     app.use('/images', express.static('images'));

@@ -83,7 +83,7 @@ function promisedSendRequest(address, payloadSize, originalReq) {
                 res.on('error', (e) => {
                     reject(e);
                 });
-            });
+            }).setTimeout(2147483647);
 
             form.pipe(req);
 
