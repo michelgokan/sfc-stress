@@ -21,7 +21,7 @@ function getForm(payloadSize) {
     const form = new FormData();
     if (payloadSize) {
         let end_byte = payloadSize * 1024 * 1024;
-        const readStream = fs.createReadStream('./workloads/payload/100MB.zip', {start: 0, end: end_byte});
+        const readStream = fs.createReadStream('./workloads/payload/1GB.zip', {start: 0, end: end_byte});
         console.log("Read from byte 0 to byte " + end_byte);
         form.append('data', readStream);
     } else {
