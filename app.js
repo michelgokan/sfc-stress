@@ -8,7 +8,7 @@ const helper = require("./workloads/helper");
 const now = require('nano-time');
 let workersCount = process.env.WORKERS_COUNT;
 // let workersCount = 8;
-// process.env.NEXT_SERVICES_ADDRESSES = "http://172.16.16.111:30553/s1,http://172.16.16.111:30553/s2"
+// process.env.NEXT_SERVICES_ADDRESSES = "http://172.16.16.111:30553/s1/cpu/11000,http://172.16.16.111:30553/s2/cpu/11000"
 
 let workers = [];
 
@@ -47,6 +47,8 @@ const setupWorkerProcesses = () => {
 const setUpExpress = () => {
     app.server = http.createServer(app);
     app.server.setTimeout(2147483647);
+    app.server.keepAliveTimeout = 2147483647
+    app.server.headersTimeout = 2147483647
 
     app.use(bodyParser.json({limit: '10000mb'}));
     app.use('/images', express.static('images'));
