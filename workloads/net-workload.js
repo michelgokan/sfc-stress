@@ -37,8 +37,8 @@ function sendRequest(address, payloadSize) {
     const form = getForm(payloadSize);
     options.headers = form.getHeaders();
     options.agent = new http.Agent({
-        keepAlive: true,
-        keepAliveMsecs: 2147483647
+        keepAlive: false
+        // keepAliveMsecs: 2147483647
     });
     const req = http.request(options).setTimeout(2147483647);
 
@@ -73,8 +73,8 @@ function promisedSendRequest(address, payloadSize, originalReq) {
             const form = getForm(payloadSize);
             options.headers = form.getHeaders();
             options.agent = new http.Agent({
-                keepAlive: true,
-                keepAliveMsecs: 2147483647
+                keepAlive: false
+                // keepAliveMsecs: 2147483647
             });
             const req = http.request(options, (res) => {
                 let body = [];

@@ -76,6 +76,8 @@ const setUpExpress = () => {
             next(err);
         });
 
+        res.setHeader('Connection', 'close');
+
         next();
     })
 
