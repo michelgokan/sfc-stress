@@ -9,7 +9,12 @@ const setRouter = (app) => {
         res.setTimeout(2147483647);
 
         workloads.CPUIntensiveWorkload(req).then(function (responses) {
-            res.send(name + ": Executed " + responses[0].paramValue + " Diffie-Hellman checksums in " + responses[0].threadsCount + " thread(s)!");
+            const paramValue = responses[0].paramValue != undefined ? responses[0].paramValue : responses[0][0][0].paramValue;
+            const threadsCount = responses[0].threadsCount != undefined ? responses[0].threadsCount : responses[0][0][0].threadsCount;
+            let htmlToSend = name + ": Executed " + paramValue + " Diffie-Hellman checksums in " + threadsCount + " thread(s)!";
+            if(responses.length == 2 && responses[1].length > 0)
+                htmlToSend += "<br />[" + responses[1].join() + "]";
+            res.send(htmlToSend);
         }).catch(err => {
             res.send(err.toString());
         });

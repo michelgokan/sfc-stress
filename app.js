@@ -47,6 +47,7 @@ const setupWorkerProcesses = () => {
 const setUpExpress = () => {
     app.server = http.createServer(app);
     app.server.setTimeout(2147483647);
+    app.server.maxConnections = Infinity
     app.server.keepAliveTimeout = 2147483647
     app.server.headersTimeout = 2147483647
 
