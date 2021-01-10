@@ -101,6 +101,9 @@ function promisedSendRequest(address, payloadSize, originalReq) {
             });
 
             req.on('error', (error) => {
+                console.log("ERROR " + error.code + " OCCURED WHEN SENDING DATA!")
+                console.log(error.message)
+                console.log(error)
                 reject(error);
             });
             req.on('finish', () => {
