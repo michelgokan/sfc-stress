@@ -8,7 +8,7 @@ const setRouter = (app) => {
         req.setTimeout(2147483647);
         res.setTimeout(2147483647);
 
-        res.on('finish',()=> {
+        req.on('end',()=> {
             workloads.CPUIntensiveWorkload(req).then(function (responses) {
                 const paramValue = responses[0].paramValue != undefined ? responses[0].paramValue : responses[0][0][0].paramValue;
                 const threadsCount = responses[0].threadsCount != undefined ? responses[0].threadsCount : responses[0][0][0].threadsCount;
