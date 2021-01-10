@@ -12,7 +12,7 @@ module.exports = {
     },
     generatePromises: function (paramValue, threadsCount, filePath, func) {
         let promises = [];
-        if (threadsCount == 1) {
+        if (parseInt(threadsCount) === 1) {
             promises.push(new Promise((resolve, reject) => {
                 Promise.resolve(func(paramValue)).then(function (value) {
                     resolve({paramValue: paramValue, threadsCount: threadsCount});
