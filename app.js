@@ -77,8 +77,8 @@ const setUpExpress = () => {
             next(err);
         });
 
-        res.setHeader('Connection', 'close');
-        res.set('Connection', 'close');
+        // res.setHeader('Connection', 'close');
+        // res.set('Connection', 'close');
 
         next();
     })
