@@ -8,15 +8,17 @@ const setRouter = (app) => {
         req.setTimeout(2147483647);
         res.setTimeout(2147483647);
 
-        workloads.CPUIntensiveWorkload(req).then(function (responses) {
-            const paramValue = responses[0].paramValue != undefined ? responses[0].paramValue : responses[0][0][0].paramValue;
-            const threadsCount = responses[0].threadsCount != undefined ? responses[0].threadsCount : responses[0][0][0].threadsCount;
-            let htmlToSend = name + ": Executed " + paramValue + " Diffie-Hellman checksums in " + threadsCount + " thread(s)!";
-            if(responses.length == 2 && responses[1].length > 0)
-                htmlToSend += "<br />[" + responses[1].join() + "]";
-            res.send(htmlToSend);
-        }).catch(err => {
-            res.send(err.toString());
+        res.on('finish',()=> {
+            workloads.CPUIntensiveWorkload(req).then(function (responses) {
+                const paramValue = responses[0].paramValue != undefined ? responses[0].paramValue : responses[0][0][0].paramValue;
+                const threadsCount = responses[0].threadsCount != undefined ? responses[0].threadsCount : responses[0][0][0].threadsCount;
+                let htmlToSend = name + ": Executed " + paramValue + " Diffie-Hellman checksums in " + threadsCount + " thread(s)!";
+                if (responses.length == 2 && responses[1].length > 0)
+                    htmlToSend += "<br />[" + responses[1].join() + "]";
+                res.send(htmlToSend);
+            }).catch(err => {
+                res.send(err.toString());
+            });
         });
     });
     router.all('*/mem/:dataSize?/:threadsCount?/:sendToNext?/:payloadSize?/:isPromised?', (req, res) => {
