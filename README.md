@@ -23,13 +23,22 @@ Stores and release <dataSize>MB of data in the memory as a variable! It then cal
 Writes <fileSize>MB of data in the disk and then deletes it! It then calls the NetworkIntensiveWorload with zero payload if sendToNext parameter is true.
 
 ## Network Intensive Workload:
-Send <payloadSize>MB of data over network (POST HTTP) to N number of destinations specified in a comma separated environment variable NEXT_SERVICES_ADDRESSES!
+Send <payloadSize>MB of data over network (POST HTTP) to N number of destinations specified in a JSON-based environment variable NEXT_SERVICES_ADDRESSES!
 It comes in 2 types:
  
 1. **Normal mode:** Send request and exit!
 2. **Promised mode:** Send request, wait for the response, and then exit!
 
 To enable promised-mode, pass 1 to isPromised parameter in */net or */x.
+
+Example of `NEXT_SERVICES_ADDRESSES` (also check the examples folder):
+```yaml
+{
+    ".*/s1/cpu/100/1.*": "http://172.16.16.111:30553/s2/mem/1/1/1"
+    ".*/s1/mem/2000.*": "http://172.16.16.111:30553/s2/mem/10/1/1,http://172.16.16.111:30553/s3/x/100"
+    ".*" : "http://172.16.16.111:30553/s3/cpu/1000/1/1/1"
+}
+```
 
 ## Combined Workload: 
 Run all workloads mentioned above once!

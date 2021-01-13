@@ -17,7 +17,7 @@ module.exports = {
         else
             payloadSize = optionalPayloadSize;
 
-        if (!helper.isAddressesAvailable(addresses))
+        if (!helper.isAddressesJSONAvailable(addresses))
             return Promise.reject("Nothing executed!");
         else {
             let result = netWorkload.executeNetWorkload(payloadSize, req, isPromised);

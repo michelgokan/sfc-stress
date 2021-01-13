@@ -15,8 +15,8 @@ spec:
     metadata:
       labels:
         app: sfc-stress
-        namespace: ingress-nginx
         name: s4
+        namespace: ingress-nginx
       annotations:
         seccomp.security.alpha.kubernetes.io/pod: "localhost/my-profile.json"
     spec:
@@ -25,7 +25,7 @@ spec:
           image: michelgokan/sfc-stress
           env:
             - name: NEXT_SERVICES_ADDRESSES
-              value: "http://172.16.16.111:30553/s5/x/1/1"
+              value: "{\".*\": \"http://172.16.16.111:30553/s5/x/1/1\"}"
             - name: NAME
               value: "s4"
             - name: WORKERS_COUNT
@@ -43,10 +43,10 @@ metadata:
     name: s4
 spec:
   ports:
-  - port: 30008
-    targetPort: 30005
-    protocol: TCP
-    name: http
+    - port: 30005
+      targetPort: 30005
+      protocol: TCP
+      name: http
   selector:
     name: s4
 
@@ -57,13 +57,18 @@ metadata:
   name: s4
   namespace: ingress-nginx
   annotations:
-     nginx.ingress.kubernetes.io/proxy-send-timeout: "18000"
-     nginx.ingress.kubernetes.io/proxy-read-timeout: "18000"
-     nginx.ingress.kubernetes.io/proxy-connect-timeout: "18000"
-     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-     nginx.ingress.kubernetes.io/proxy-body-size: "10000m"
-     nginx.org/client-max-body-size: "10000m" 
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "1800000"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "1800000"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "1800000"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10000m"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "1800000"
+    nginx.ingress.kubernetes.io/upstream-keepalive-timeout: "1800000"
+    nginx.org/client-max-body-size: "10000m"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      keepalive_timeout 1800000s;
+      send_timeout 190000s;
 spec:
   tls:
     - secretName: tls-certificate

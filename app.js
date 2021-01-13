@@ -69,7 +69,7 @@ const setUpExpress = () => {
             err.status = 408;
             next(err);
         });
-        
+
         // Set the server response timeout for all HTTP requests
         res.setTimeout(2147483647, () => {
             let err = new Error('Service Unavailable (timeout)');
@@ -87,7 +87,7 @@ const setUpExpress = () => {
 
     app.server.listen(30005, () => {
         console.log(`Started server on => http://localhost:${app.server.address().port} for Process Id ${process.pid}`);
-        process.send({ topic: "INCREMENT" });
+        process.send({topic: "INCREMENT"});
     });
 }
 
@@ -99,7 +99,7 @@ const setupServer = (isClusterRequired) => {
         setupWorkerProcesses();
         cluster.on('message', (worker, msg, handle) => {
             if (msg.topic && msg.topic === "INCREMENT") {
-                if(++onlineWorkers === parseInt(workersCount)){
+                if (++onlineWorkers === parseInt(workersCount)) {
                     console.log("Workers ready...");
                 }
             }

@@ -1,5 +1,5 @@
 const {Worker, isMainThread, parentPort, workerData} = require('worker_threads');
-const addresses = process.env.NEXT_SERVICES_ADDRESSES;
+const nextAddressesJSON = process.env.NEXT_SERVICES_ADDRESSES;
 const name = process.env.NAME === undefined ? "undefined" : process.env.NAME;
 const http = require("http");
 const helper = require("./helper");
@@ -117,13 +117,29 @@ function promisedSendRequest(address, payloadSize, originalReq) {
     });
 }
 
-function executeNetWorkload(payloadSize, req, isPromised = false) {
+function getNextServiceAddress(addressesJSON, path) {
+    let jsonObj = JSON.parse(addressesJSON);
+
+    for (let pattern in jsonObj)
+        if(RegExp(pattern).test(path))
+            return jsonObj[pattern];
+
+    return "";
+}
+
+function getSplittedAddresses(addressesJSON, req){
     let splittedAddresses = [];
 
-    if (helper.isAddressesAvailable(addresses))
-        splittedAddresses = addresses.split(",");
+    if (helper.isAddressesJSONAvailable(addressesJSON))
+        splittedAddresses = getNextServiceAddress(addressesJSON, req.path).split(",");
 
+    return splittedAddresses;
+}
+
+function executeNetWorkload(payloadSize, req, isPromised = false) {
+    let splittedAddresses = getSplittedAddresses(nextAddressesJSON, req);
     let requests = [];
+
     for (let address of splittedAddresses) {
         try {
             if (!isPromised || isPromised === "0") {
@@ -139,19 +155,6 @@ function executeNetWorkload(payloadSize, req, isPromised = false) {
     }
 
     return requests;
-}
-
-function executePromisedNetWorkload(payloadSize) {
-    let splittedAddresses = []
-    if (helper.isAddressesAvailable(addresses))
-        splittedAddresses = addresses.split(",");
-
-    let promises = [];
-    for (let address of splittedAddresses) {
-        promises.push(promisedSendRequest(address, payloadSize));
-    }
-
-    return Promise.all(promises);
 }
 
 if (!isMainThread) {
