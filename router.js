@@ -27,7 +27,12 @@ const setRouter = (app) => {
 
         req.on('data', () => {}).on('end', () => {
             workloads.memoryIntensiveWorkload(req).then(function (responses) {
-                res.send(name + ": Stored and released " + responses[0].paramValue + " x " + responses[0].threadsCount + "=" + responses[0].paramValue * responses[0].threadsCount + "MB of data in RAM using " + responses[0].threadsCount + " thread(s)!");
+                const paramValue = responses[0].paramValue != undefined ? responses[0].paramValue : responses[0][0][0].paramValue;
+                const threadsCount = responses[0].threadsCount != undefined ? responses[0].threadsCount : responses[0][0][0].threadsCount;
+                let htmlToSend = name + ": Stored and released " + paramValue + " x " + threadsCount + "=" + paramValue * threadsCount + "MB of data in RAM using " + threadsCount + " thread(s)!";
+                if (responses.length == 2 && responses[1].length > 0)
+                    htmlToSend += "<br />[" + responses[1].join() + "]";
+                res.send(htmlToSend);
             }).catch(err => {
                 res.send(err.toString());
             });
@@ -39,7 +44,12 @@ const setRouter = (app) => {
 
         req.on('data', () => {}).on('end', () => {
             workloads.blkioIntensiveWorkload(req).then(function (responses) {
-                res.send(name + ": Wrote and removed " + responses[0].paramValue + "MB x " + responses[0].threadsCount + " files = " + responses[0].paramValue * responses[0].threadsCount + "MB of data in the storage using " + responses[0].threadsCount + " thread(s)!");
+                const paramValue = responses[0].paramValue != undefined ? responses[0].paramValue : responses[0][0][0].paramValue;
+                const threadsCount = responses[0].threadsCount != undefined ? responses[0].threadsCount : responses[0][0][0].threadsCount;
+                let htmlToSend = name + ": Wrote and removed " + paramValue + "MB x " + threadsCount + " files = " + paramValue * threadsCount + "MB of data in the storage using " + threadsCount + " thread(s)!";
+                if (responses.length == 2 && responses[1].length > 0)
+                    htmlToSend += "<br />[" + responses[1].join() + "]";
+                res.send(htmlToSend);
             }).catch(err => {
                 res.send(err.toString());
             });
