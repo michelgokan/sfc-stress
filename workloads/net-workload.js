@@ -85,7 +85,7 @@ function promisedSendRequest(address, payloadSize, originalReq) {
                     let result = Buffer.concat(body).toString();
                     const durationInMilliseconds = (now() - originalReq.app.locals.start_time) / 1e6;
                     console.log(`Received ${res.method} response from ${address} at {${now()}} [REQUEST END] ${durationInMilliseconds.toLocaleString()}ms`);
-                    if(res.method == null)
+                    if (res.method == null)
                         resolve(result);
                 });
                 res.on('error', (e) => {
@@ -121,13 +121,13 @@ function getNextServiceAddress(addressesJSON, path) {
     let jsonObj = JSON.parse(addressesJSON);
 
     for (let pattern in jsonObj)
-        if(RegExp(pattern).test(path))
+        if (RegExp(pattern).test(path))
             return jsonObj[pattern];
 
     return "";
 }
 
-function getSplittedAddresses(addressesJSON, req){
+function getSplittedAddresses(addressesJSON, req) {
     let splittedAddresses = [];
 
     if (helper.isAddressesJSONAvailable(addressesJSON))
@@ -143,11 +143,13 @@ function executeNetWorkload(payloadSize, req, isPromised = false) {
     for (let address of splittedAddresses) {
         try {
             if (!isPromised || isPromised === "0") {
-                console.log("sendRequest(" + address + "," + payloadSize + ")")
-                requests.push(sendRequest(address, payloadSize));
+                console.log("sendRequest(" + address + "," + payloadSize / 2 + ") - half of " + payloadSize +
+                    " (Node.js sends twice the size of requested payload!)")
+                requests.push(sendRequest(address, payloadSize / 2));
             } else {
-                console.log("promisedSendRequest(" + address + "," + payloadSize + ")")
-                requests.push(promisedSendRequest(address, payloadSize, req));
+                console.log("promisedSendRequest(" + address + "," + payloadSize / 2 + ") - half of " + payloadSize +
+                    " (Node.js sends twice the size of requested payload!)")
+                requests.push(promisedSendRequest(address, payloadSize / 2, req));
             }
         } catch (e) {
             return e;
