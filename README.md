@@ -1,4 +1,4 @@
-# Introduction to _sfc-stress_: A Synthetic Service Chain 
+# Introduction to _sfc-stress_: A customizable synthetic service chain 
 **_sfc-stress_** is a customizable, multi-threaded, and Docker/Kubernetes based synthetic chain of services that is used to generate different types of service chaines with various types of workloads. It can be used to emulate any type of service chains in a cluster and can be easily deployed in Kubernetes or Docker Swarm environments. For example, you can generate a service chain like below (this is just an example, you can design your own service chain):    
 
 ![Image of a service chain](./images/service_chain.jpg)
