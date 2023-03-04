@@ -7,7 +7,7 @@ const helper = require('./helper');
 
 module.exports = {
     networkIntensiveWorkload: function (req = undefined, isEmptyRequest = false, optionalPayloadSize = undefined) {
-        let isPromised = helper.getParameter(req, 'isPromised', false);
+        let isPromised = helper.getParameter(req, 'isPromised',  false);
 
         let payloadSize;
         if (isEmptyRequest)
@@ -29,9 +29,9 @@ module.exports = {
             threadsCount = helper.getParameter(req, 'threadsCount'),
             payloadSize = helper.getParameter(req, 'payloadSize', -1);
 
-        sendToNext = sendToNext == undefined ? helper.getParameter(req, 'sendToNext', false) > 0 : sendToNext;
+        sendToNext = sendToNext === undefined ? helper.getParameter(req, 'sendToNext', false) > 0 : sendToNext;
 
-        if (workloadSize == 0 || threadsCount == 0) return Promise.reject("Nothing executed!");
+        if (workloadSize === 0 || threadsCount === 0) return Promise.reject("Nothing executed!");
 
         let promises = helper.generatePromises(workloadSize, threadsCount, "./workloads/cpu-workload.js", cpuWorkload.executeCPUWorkload);
         return helper.getReturnPromises(promises, req, sendToNext, payloadSize, this.networkIntensiveWorkload);
@@ -41,9 +41,9 @@ module.exports = {
             threadsCount = helper.getParameter(req, 'threadsCount'),
             payloadSize = helper.getParameter(req, 'payloadSize', -1);
 
-        sendToNext = sendToNext == undefined ? helper.getParameter(req, 'sendToNext', false) > 0 : sendToNext;
+        sendToNext = sendToNext === undefined ? helper.getParameter(req, 'sendToNext', false) > 0 : sendToNext;
 
-        if (dataSize == 0 || threadsCount == 0) return Promise.reject("Nothing executed!");
+        if (dataSize === 0 || threadsCount === 0) return Promise.reject("Nothing executed!");
 
         let promises = helper.generatePromises(dataSize, threadsCount, "./workloads/mem-workload.js", memWorkload.executeMemWorkload)
         return helper.getReturnPromises(promises, req, sendToNext, payloadSize, this.networkIntensiveWorkload);
@@ -53,9 +53,9 @@ module.exports = {
             threadsCount = helper.getParameter(req, 'threadsCount'),
             payloadSize = helper.getParameter(req, 'payloadSize', -1);
 
-        sendToNext = sendToNext == undefined ? helper.getParameter(req, 'sendToNext', false) > 0 : sendToNext;
+        sendToNext = sendToNext === undefined ? helper.getParameter(req, 'sendToNext', false) > 0 : sendToNext;
 
-        if (fileSize == 0 || threadsCount == 0) return Promise.reject("Nothing executed!");
+        if (fileSize === 0 || threadsCount === 0) return Promise.reject("Nothing executed!");
 
         let promises = helper.generatePromises(fileSize, threadsCount, "./workloads/blkio-workload.js", blkioWorkload.executeBlkioWorkload)
         return helper.getReturnPromises(promises, req, sendToNext, payloadSize, this.networkIntensiveWorkload);

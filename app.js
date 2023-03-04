@@ -53,6 +53,9 @@ const setUpExpress = () => {
 
     app.use(bodyParser.json({limit: '10000mb'}));
     app.use('/images', express.static('images'));
+    app.get('/health', (req, res) => {
+        res.send('OK');
+    });
     app.use((req, res, next) => {
         app.locals.start_time = now();
         const start = process.hrtime();
