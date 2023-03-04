@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sfc-stress
-  namespace: ingress-nginx
   labels:
     app: sfc-stress
 spec:
@@ -14,7 +13,6 @@ spec:
     metadata:
       labels:
         app: sfc-stress
-        namespace: ingress-nginx
     spec:
       containers:
         - name: sfc-stress
@@ -31,7 +29,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sfc-stress
-  namespace: ingress-nginx
   labels:
     app: sfc-stress
 spec:
@@ -44,23 +41,26 @@ spec:
     app: sfc-stress
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: sfc-stress
-  namespace: ingress-nginx
   annotations:
      nginx.ingress.kubernetes.io/ssl-redirect: "false"
      nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
      nginx.ingress.kubernetes.io/proxy-body-size: "10000m"
      nginx.org/client-max-body-size: "10000m"
 spec:
-  tls:
-    - secretName: tls-certificate
+  #  tls:
+  # - secretName: tls-certificate
   rules:
-    - http:
+    - host: sfc-stress.dev
+      http:
         paths:
-          - path: /workload
+          - pathType: Prefix
+            path: /workload
             backend:
-              serviceName: sfc-stress
-              servicePort: 30005
+              service:
+                name: sfc-stress
+                port: 
+                  number: 30005
