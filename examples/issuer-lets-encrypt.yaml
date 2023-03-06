@@ -1,0 +1,15 @@
+# issuer-lets-encrypt-staging.yaml
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-sfc-stress
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: michel.gokan@kau.se # ❗ Replace this with your email address
+    privateKeySecretRef:
+      name: letsencrypt-sfc-stress
+    solvers:
+    - http01:
+        ingress:
+          name: web-ingress

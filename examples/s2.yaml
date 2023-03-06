@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: s2
-  namespace: ingress-nginx
   labels:
     app: sfc-stress
     name: s2
@@ -17,46 +16,57 @@ spec:
         app: sfc-stress
         name: s2
         namespace: ingress-nginx
-      annotations:
-        seccomp.security.alpha.kubernetes.io/pod: "localhost/my-profile.json"
     spec:
+      nodeSelector:
+        cloud.google.com/gke-nodepool: pool-1
+      securityContext:
+        seccompProfile:
+          type: Localhost
+          localhostProfile: my-profile.json
       containers:
         - name: s2
           image: michelgokan/sfc-stress
           env:
-            - name: NEXT_SERVICES_ADDRESSES
-              value: "{\".*\": \"http://172.16.16.111:30553/s3/net/1/0,http://172.16.16.111:30553/s7/x/1/0\"}"
+            #- name: NEXT_SERVICES_ADDRESSES
+            #  value: "{\".*\": \"http://s3.default.svc.cluster.local:30005/net/1/0,http://s7.default.svc.cluster.local:30005/x/1/0\"}"
             - name: NAME
               value: "s2"
             - name: WORKERS_COUNT
               value: "100"
           ports:
             - containerPort: 30005
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 30005
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: s2
-  namespace: ingress-nginx
   labels:
     app: sfc-stress
     name: s2
 spec:
   ports:
-    - port: 30005
-      targetPort: 30005
-      protocol: TCP
-      name: http
+  - port: 30005
+    targetPort: 30005
+    protocol: TCP
+    name: http
   selector:
     name: s2
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: s2
-  namespace: ingress-nginx
   annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.global-static-ip-name: web-ip
+    cert-manager.io/issuer: letsencrypt-sfc-stress
     nginx.ingress.kubernetes.io/proxy-send-timeout: "1800000"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "1800000"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "1800000"
@@ -73,9 +83,14 @@ spec:
   tls:
     - secretName: tls-certificate
   rules:
-    - http:
+    - host: 34.77.49.243.nip.io
+#    - host: sfc-stress.perfsim.com
+      http:
         paths:
-          - path: /s2
+          - pathType: Prefix
+            path: /s2
             backend:
-              serviceName: s2
-              servicePort: 30005
+              service:
+                name: s2
+                port:
+                  number: 30005
