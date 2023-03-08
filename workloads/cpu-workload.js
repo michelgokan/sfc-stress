@@ -9,6 +9,7 @@ function checksum(str, algorithm, encoding) {
 }
 
 function executeCPUWorkload(workloadSize) {
+    console.log("Workload size: " + workloadSize);
     for (let $i = 0; $i < workloadSize; $i++) {
         const prime_length = 100;
         const diffHell = crypto.createDiffieHellman(prime_length);
