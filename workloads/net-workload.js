@@ -82,9 +82,10 @@ function promisedSendRequest(address, payloadSize, originalReq) {
                     body.push(chunk);
                 }).setTimeout(2147483647);
                 res.on('end', function () {
-                    let result = Buffer.concat(body).toString();
+                    let result = "{\"" + Buffer.concat(body).toString() + "\": ";
                     const durationInMilliseconds = (now() - originalReq.app.locals.start_time) / 1e6;
                     console.log(`Received ${res.method} response from ${address} at {${now()}} [REQUEST END] ${durationInMilliseconds.toLocaleString()}ms`);
+                    result += "\"" + durationInMilliseconds.toLocaleString() + "ms\"},";
                     if(res.method == null)
                         resolve(result);
                 });
@@ -101,7 +102,7 @@ function promisedSendRequest(address, payloadSize, originalReq) {
             });
 
             req.on('error', (error) => {
-                console.log("ERROR " + error.code + " OCCURED WHEN SENDING DATA!")
+                console.log("ERROR " + error.code + " OCCURRED WHEN SENDING DATA!")
                 console.log(error.message)
                 console.log(error)
                 reject(error);
@@ -119,8 +120,6 @@ function promisedSendRequest(address, payloadSize, originalReq) {
 
 function getNextServiceAddress(addressesJSON, path) {
     let jsonObj = JSON.parse(addressesJSON);
-
-    console.log("Current path: " + path);
 
     for (let pattern in jsonObj)
         if(RegExp(pattern).test(path))
