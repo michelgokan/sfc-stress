@@ -7,6 +7,7 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "@fortaine/fetch-event-source": "^3.0.6",
     "bigdecimal": "^0.6.1",
     "body-parser": "^1.20.2",
     "cluster": "^0.7.7",
@@ -15,20 +16,21 @@
     "fluent-ffmpeg": "^2.1.2",
     "form-data": "^4.0.0",
     "fs": "^0.0.1-security",
+    "json-schema": "^0.4.0",
     "lodash": "^4.17.21",
     "malloc": "^1.1.0",
     "nano-time": "^1.0.0",
+    "node-fetch": "^3.3.1",
     "showdown": "^2.1.0",
     "sync-request": "^6.1.0",
     "url": "^0.11.0",
-    "url-to-options": "^2.0.0",
-    "json-schema": "^0.4.0"
+    "url-to-options": "^2.0.0"
   },
   "devDependencies": {
     "js-big-decimal": "^1.4.1",
+    "json-schema": "^0.4.0",
     "node-cmd": "^5.0.0",
     "range": "^0.0.3",
-    "request": "^2.88.2",
-    "json-schema": "^0.4.0"
+    "request": "^2.88.2"
   }
 }
