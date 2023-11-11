@@ -121,6 +121,8 @@ function promisedSendRequest(address, payloadSize, originalReq) {
 function getNextServiceAddress(addressesJSON, path) {
     let jsonObj = JSON.parse(addressesJSON);
 
+    console.log("Current path: " + path);
+
     for (let pattern in jsonObj)
         if(RegExp(pattern).test(path))
             return jsonObj[pattern];
