@@ -82,10 +82,28 @@ function promisedSendRequest(address, payloadSize, originalReq) {
                     body.push(chunk);
                 }).setTimeout(2147483647);
                 res.on('end', function () {
-                    let result = "{\"" + Buffer.concat(body).toString() + "\": ";
+                    let bodyString = Buffer.concat(body).toString();
+                    let is_json = false;
+
+                    // Check if bodyString is a valid JSON (any type of json is acceptable)
+                    try {
+                        JSON.parse(bodyString);
+                        is_json = true;
+                    } catch (e) {
+                    }
+
                     const durationInMilliseconds = (now() - originalReq.app.locals.start_time) / 1e6;
                     console.log(`Received ${res.method} response from ${address} at {${now()}} [REQUEST END] ${durationInMilliseconds.toLocaleString()}ms`);
-                    result += "\"" + durationInMilliseconds.toLocaleString() + "ms\"},";
+                    let result =
+                        "[{\"" + Buffer.concat(body).toString() +
+                        "\": { \"duration\": \"" + durationInMilliseconds.toLocaleString() +
+                        "ms\","
+                    if(!is_json) {
+                        result += " \"subRequests\": []}]";
+                    } else {
+                        result += " \"subRequests\": " + JSON.stringify(bodyString) + "}]";
+                    }
+
                     if(res.method == null)
                         resolve(result);
                 });
