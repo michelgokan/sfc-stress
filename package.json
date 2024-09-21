@@ -9,10 +9,10 @@
   "dependencies": {
     "@fortaine/fetch-event-source": "^3.0.6",
     "bigdecimal": "^0.6.1",
-    "body-parser": "^1.20.2",
+    "body-parser": "^1.20.3",
     "cluster": "^0.7.7",
     "crypto": "^1.0.1",
-    "express": "^4.19.2",
+    "express": "^4.21.0",
     "fluent-ffmpeg": "^2.1.2",
     "form-data": "^4.0.0",
     "fs": "^0.0.1-security",
