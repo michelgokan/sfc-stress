@@ -12,7 +12,7 @@
     "body-parser": "^1.20.2",
     "cluster": "^0.7.7",
     "crypto": "^1.0.1",
-    "express": "^4.19.2",
+    "express": "^4.21.0",
     "fluent-ffmpeg": "^2.1.2",
     "form-data": "^4.0.0",
     "fs": "^0.0.1-security",
